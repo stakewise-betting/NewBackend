@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 .catch(err => console.error('MongoDB Connection Error:', err));
 
 // **Blockchain Setup**
-const contractAddress = "0xdDA976d4A6250Eaa463Fc744DB8CDb5B3a45B2B8";
+const contractAddress = "0xC57D2b7E0dDaad51E54D94Ebd41A4DE5656A0BF3";
 const contractABI =  [
   {
     "inputs": [],
