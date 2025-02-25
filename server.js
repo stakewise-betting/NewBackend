@@ -14,6 +14,11 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const Event = require('./models/event');
 
+const fs = require('fs');
+const path = require('path');
+const PDFDocument = require('pdfkit'); // Import PDFKit
+ // Import Event model
+
 // MongoDB Connection (Keep your existing MongoDB connection)
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -478,6 +483,11 @@ app.post('/send-notification', (req, res) => {
 
     res.status(200).send({ message: 'Notification sent to all clients' });
 });
+
+// API to generate and download a betting report in PDF format
+const reportRoutes = require("./routes/reportRoutes");
+app.use("/api/report", reportRoutes);
+
 
 // WebSocket Connection Handling (Keep your existing WebSocket handling)
 wss.on('connection', ws => {
