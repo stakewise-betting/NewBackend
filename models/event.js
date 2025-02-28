@@ -16,6 +16,7 @@ const eventSchema = new mongoose.Schema({
     options: { type: [String], required: true },
     notificationMessage: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
+    notificationImageURL: { type: String, required: true }
 });
 
 module.exports = mongoose.model("Event", eventSchema);
