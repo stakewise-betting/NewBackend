@@ -5,7 +5,7 @@ module.exports = {
     mongodbUri: process.env.MONGODB_URI,
     port: process.env.PORT || 5000,
     blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-    contractAddress: "0x2F5818ec85809da4d02072CcF8A937ce65DAC28d", // Keep contract address here if it's config
+    contractAddress: "0x139950f9Fe3a010F943a3d1108395aA2014cC7bD", // Keep contract address here if it's config
     contractABI:  [
       {
         "inputs": [],

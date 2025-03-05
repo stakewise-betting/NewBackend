@@ -3,7 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const eventRoutes = require('./routes/eventRoutes'); // Import event routes
 const notificationRoutes = require('./routes/notificationRoutes'); // Import notification routes
-const reportRoutes = require('./routes/reportRoutes'); // Import report routes - already extracted
+const reportRoutes = require('./routes/reportRoutes');
+const commentRoutes = require('./routes/commentRoutes'); // Import comment routes
+
 
 const app = express();
 
@@ -14,6 +16,7 @@ app.use(express.json());
 // Routes
 app.use('/api/events', eventRoutes);       // Use event routes
 app.use('/api/notifications', notificationRoutes); // Use notification routes
-app.use("/api/report", reportRoutes);       // Use report routes - already extracted
+app.use("/api/report", reportRoutes); // Use report routes - already extracted
+app.use("/api/comments", commentRoutes);
 
 module.exports = app;
