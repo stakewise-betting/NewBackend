@@ -1,9 +1,13 @@
+
 import { WebSocketServer } from 'ws';
+
 
 let wss;
 
 const initializeWebSocket = (server) => {
+
     wss = new WebSocketServer({ server }); // Use WebSocketServer instead of WebSocket.Server
+
 
     wss.on('connection', ws => {
         console.log('Client connected');
@@ -11,7 +15,9 @@ const initializeWebSocket = (server) => {
         ws.on('message', message => {
             console.log(`Received message: ${message}`);
             wss.clients.forEach(client => {
+
                 if (client !== ws && client.readyState === ws.OPEN) {
+
                     client.send(`Server says: ${message}`);
                 }
             });
@@ -27,7 +33,8 @@ const initializeWebSocket = (server) => {
     });
 
     console.log('WebSocket server initialized');
-    return wss;
+
+    return wss; // Export wss instance if needed elsewhere
 };
 
 const getWssInstance = () => {
@@ -37,16 +44,21 @@ const getWssInstance = () => {
     return wss;
 };
 
+
 const sendNotificationToClients = (payload) => {
     if (!wss) {
         console.error("WebSocket server not initialized.");
         return;
     }
     wss.clients.forEach(client => {
+
         if (client.readyState === client.OPEN) {
+
             client.send(JSON.stringify(payload));
         }
     });
 };
 
+
 export { initializeWebSocket, getWssInstance, sendNotificationToClients };
+

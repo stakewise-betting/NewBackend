@@ -1,9 +1,11 @@
 // services/blockchainService.js
+
 import Web3 from 'web3';
 import mongoose from 'mongoose';
 import EventModel from '../models/event.js';
 import config from '../config/config.js';
 import {sendNotificationToClients} from './websocketService.js';
+
 
 let contractBackend;
 
@@ -49,7 +51,9 @@ const setupBlockchainListeners = () => {
                         notificationImageURL: notificationImageURL
                     };
 
+
                     sendNotificationToClients({
+
                         type: 'newEvent',
                         notificationMessage: notificationMessage,
                         notificationImageURL: notificationImageURL,
@@ -66,4 +70,6 @@ const setupBlockchainListeners = () => {
         });
 };
 
+
 export { setupBlockchainListeners };
+
