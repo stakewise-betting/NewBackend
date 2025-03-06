@@ -1,10 +1,16 @@
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
-const PDFDocument = require("pdfkit");
-const Event = require("../models/event"); // Import Event model
+// routes/pdfReportRoutes.js
+import express from "express";
+import fs from "fs";
+import path from "path";
+import PDFDocument from "pdfkit";
+import Event from "../models/event.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // API to generate and download a betting report in PDF format
 router.get("/pdf", async (req, res) => {
@@ -73,4 +79,4 @@ router.get("/pdf", async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

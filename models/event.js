@@ -1,5 +1,5 @@
 // models/event.model.js
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const eventSchema = new mongoose.Schema({
     eventId: { 
@@ -19,4 +19,4 @@ const eventSchema = new mongoose.Schema({
     notificationImageURL: { type: String, required: true }
 });
 
-module.exports = mongoose.model("Event", eventSchema);
+export default mongoose.model("Event", eventSchema);

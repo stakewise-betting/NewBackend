@@ -1,10 +1,13 @@
-// services/websocketService.js
-const WebSocket = require('ws');
+
+import { WebSocketServer } from 'ws';
+
 
 let wss;
 
 const initializeWebSocket = (server) => {
-    wss = new WebSocket.Server({ server });
+
+    wss = new WebSocketServer({ server }); // Use WebSocketServer instead of WebSocket.Server
+
 
     wss.on('connection', ws => {
         console.log('Client connected');
@@ -12,7 +15,9 @@ const initializeWebSocket = (server) => {
         ws.on('message', message => {
             console.log(`Received message: ${message}`);
             wss.clients.forEach(client => {
-                if (client !== ws && client.readyState === WebSocket.OPEN) {
+
+                if (client !== ws && client.readyState === ws.OPEN) {
+
                     client.send(`Server says: ${message}`);
                 }
             });
@@ -28,6 +33,7 @@ const initializeWebSocket = (server) => {
     });
 
     console.log('WebSocket server initialized');
+
     return wss; // Export wss instance if needed elsewhere
 };
 
@@ -45,10 +51,14 @@ const sendNotificationToClients = (payload) => {
         return;
     }
     wss.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
+
+        if (client.readyState === client.OPEN) {
+
             client.send(JSON.stringify(payload));
         }
     });
 };
 
-module.exports = { initializeWebSocket, getWssInstance, sendNotificationToClients };
+
+export { initializeWebSocket, getWssInstance, sendNotificationToClients };
+

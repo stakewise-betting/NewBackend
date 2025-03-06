@@ -1,9 +1,10 @@
 // services/blockchainService.js
-const Web3 = require('web3');
-const mongoose = require('mongoose'); // Import mongoose here as well
-const EventModel = require('../models/event'); // Import Event model
-const config = require('../config/config');
-const websocketService = require('./websocketService');
+
+import Web3 from 'web3';
+import mongoose from 'mongoose';
+import EventModel from '../models/event.js';
+import config from '../config/config.js';
+import {sendNotificationToClients} from './websocketService.js';
 
 
 let contractBackend;
@@ -41,7 +42,6 @@ const setupBlockchainListeners = () => {
                     const notificationImageURL = eventFromDb ? eventFromDb.notificationImageURL : null;
                     console.log("notificationImageURL from MongoDB:", notificationImageURL);
 
-
                     const eventDataForNotification = {
                         eventId: eventDetails.eventId,
                         name: eventDetails.name,
@@ -51,7 +51,9 @@ const setupBlockchainListeners = () => {
                         notificationImageURL: notificationImageURL
                     };
 
-                    websocketService.sendNotificationToClients({
+
+                    sendNotificationToClients({
+
                         type: 'newEvent',
                         notificationMessage: notificationMessage,
                         notificationImageURL: notificationImageURL,
@@ -68,4 +70,6 @@ const setupBlockchainListeners = () => {
         });
 };
 
-module.exports = { setupBlockchainListeners };
+
+export { setupBlockchainListeners };
+
