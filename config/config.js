@@ -1,11 +1,10 @@
 // config/config.js
-require('dotenv').config();
 
-module.exports = {
+const config = {
     mongodbUri: process.env.MONGODB_URI,
     port: process.env.PORT || 5000,
     blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-    contractAddress: "0x2F5818ec85809da4d02072CcF8A937ce65DAC28d", // Keep contract address here if it's config
+    contractAddress: "0x3987177272727E6B6Ae242e646f3A5dA28A2ebdf", // Keep contract address here if it's config
     contractABI:  [
       {
         "inputs": [],
@@ -415,3 +414,5 @@ module.exports = {
       }
     ],
 };
+
+export default config;

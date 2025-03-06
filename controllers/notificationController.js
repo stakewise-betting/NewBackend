@@ -1,7 +1,7 @@
 // controllers/notificationController.js
-const websocketService = require('../services/websocketService');
+import {sendNotificationToClients} from "../services/websocketService.js";
 
-const sendGenericNotification = (req, res) => {
+export const sendGenericNotification = (req, res) => {
     const message = req.body.message;
     const notificationImageURL = req.body.notificationImageURL;
 
@@ -9,7 +9,7 @@ const sendGenericNotification = (req, res) => {
         return res.status(400).send({ message: 'Notification message is required' });
     }
 
-    websocketService.sendNotificationToClients({
+    sendNotificationToClients({
         type: 'notification',
         message: message,
         notificationImageURL: notificationImageURL || null
@@ -17,5 +17,3 @@ const sendGenericNotification = (req, res) => {
 
     res.status(200).send({ message: 'Notification sent to all clients' });
 };
-
-module.exports = { sendGenericNotification };
