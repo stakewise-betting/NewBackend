@@ -7,7 +7,7 @@ import userRouter from "./routes/userRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
-import commentRoutes from'./routes/commentRoutes'; 
+import commentRoutes from'./routes/commentRoutes.js'; 
 
 
 const app = express();

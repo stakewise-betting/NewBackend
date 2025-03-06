@@ -1,6 +1,6 @@
 // backend >> const express = require('express');
-const Comment = require('../models/comment');
-const express = require('express');
+import Comment from '../models/comment.js';
+import express from 'express';
 const router = express.Router();
 
 
@@ -67,4 +67,4 @@ router.delete("/:commentId", async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;
