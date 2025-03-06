@@ -1,22 +1,31 @@
-// app.js
-const express = require('express');
-const cors = require('cors');
-const eventRoutes = require('./routes/eventRoutes'); // Import event routes
-const notificationRoutes = require('./routes/notificationRoutes'); // Import notification routes
-const reportRoutes = require('./routes/reportRoutes');
-const commentRoutes = require('./routes/commentRoutes'); // Import comment routes
+
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/authRoutes.js";
+import userRouter from "./routes/userRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
+import commentRoutes from'./routes/commentRoutes'; 
 
 
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
 
-// Routes
-app.use('/api/events', eventRoutes);       // Use event routes
-app.use('/api/notifications', notificationRoutes); // Use notification routes
-app.use("/api/report", reportRoutes); // Use report routes - already extracted
+app.use(express.json());
+const allowedOrigins = ["http://localhost:5173"]; // frontend url
+app.use(cors({ origin: allowedOrigins, credentials: true })); // connecting the frontend to the backend
+app.use(cookieParser());
+
+// API Endpoints (Routes)
+app.use("/api/events", eventRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/report", reportRoutes);
+app.use("/api/auth", authRouter);
+app.use("/api/user", userRouter);
 app.use("/api/comments", commentRoutes);
 
-module.exports = app;
+export default app;
+

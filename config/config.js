@@ -1,7 +1,5 @@
 // config/config.js
-require('dotenv').config();
-
-module.exports = {
+const config = {
     mongodbUri: process.env.MONGODB_URI,
     port: process.env.PORT || 5000,
     blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
@@ -415,3 +413,5 @@ module.exports = {
       }
     ],
 };
+
+export default config;
