@@ -1,3 +1,4 @@
+
 // const http = require('http');
 // const mongoose = require('mongoose');
 // const app = require('./app'); // Import the Express app
@@ -33,6 +34,3 @@ mongoose.connect(config.mongodbUri)
         });
     })
     .catch(err => console.error('MongoDB Connection Error:', err));
-
-
-

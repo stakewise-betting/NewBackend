@@ -1,7 +1,9 @@
 // controllers/eventController.js
+
 import EventModel from "../models/event.js";
 
 export const createEvent = async (req, res) => {
+
     try {
         const eventData = req.body;
 
@@ -25,6 +27,8 @@ export const createEvent = async (req, res) => {
         res.status(201).send({ message: 'Event saved to MongoDB', eventId: eventData.eventId });
     } catch (error) {
         console.error('Error saving event to MongoDB:', error);
+
         res.status(500).send({ message: 'Failed to save event to MongoDB', error });
     }
 };
+

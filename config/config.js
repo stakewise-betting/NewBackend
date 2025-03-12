@@ -1,5 +1,4 @@
 // config/config.js
-
 const config = {
     mongodbUri: process.env.MONGODB_URI,
     port: process.env.PORT || 5000,
