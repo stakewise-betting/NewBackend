@@ -11,9 +11,16 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-const allowedOrigins = ["http://localhost:5173"]; // frontend url
-app.use(cors({ origin: allowedOrigins, credentials: true })); // connecting the frontend to the backend
+
+const allowedOrigins = ["http://localhost:5173"]; // frontend URL
+app.use(cors({ origin: allowedOrigins, credentials: true })); // Connecting frontend to backend
 app.use(cookieParser());
+
+// Ensure COOP is applied after CORS
+app.use((req, res, next) => {
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    next();
+});
 
 // API Endpoints (Routes)
 app.use("/api/events", eventRoutes);

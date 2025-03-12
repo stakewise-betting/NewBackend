@@ -7,6 +7,9 @@ import {
   PASSWORD_RESET_TEMPLATE,
 } from "../config/emailTemplate.js";
 
+import { OAuth2Client } from "google-auth-library";
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 // register controller
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -32,7 +35,7 @@ export const register = async (req, res) => {
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
-    }); //creating a token for the user using user id
+    }); //creating a token for the user using user id. acts as a long-lived access token.
 
     res.cookie("token", token, {
       httpOnly: true, //cookie cannot be accessed by client side script
@@ -95,6 +98,59 @@ export const login = async (req, res) => {
     return res.status(200).json({ success: true, user });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Google Login
+export const googleLogin = async (req, res) => {
+  const { token: googleToken } = req.body; // Renamed to avoid conflict
+
+  try {
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: googleToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return res.status(400).json({ success: false, message: "Invalid token" });
+    }
+
+    const { sub, email, name, picture } = payload; // Extract user details
+
+    // Check if user already exists in MongoDB
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      // Create new user in MongoDB if not exists
+      user = new userModel({
+        googleId: sub,
+        email,
+        name,
+        picture,
+        password: null, // No password required for Google auth
+      });
+      await user.save();
+    }
+
+    // Generate a JWT for session management
+    const authToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" } // Token expires in 7 days
+    );
+
+    res.cookie("token", authToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Cookie works on HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // Cross-site cookies
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie will be removed after 7 days
+    });
+
+    res.json({ success: true, user, token: authToken });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({ success: false, message: "Google login failed" });
   }
 };
 
@@ -265,7 +321,7 @@ export const verifyResetOtp = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 //Reset user password
 export const resetPassword = async (req, res) => {
@@ -282,7 +338,7 @@ export const resetPassword = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found" });
     }
-   
+
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     user.password = hashedPassword;
     await user.save();

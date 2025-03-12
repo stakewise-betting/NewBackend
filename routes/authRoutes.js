@@ -9,8 +9,10 @@ import {
   resetPassword,
   sendResetOtp,
   verifyResetOtp,
+  googleLogin,
 } from "../controllers/authController.js";
 import userAuth from "../middleware/userAuth.js";
+
 
 const authRouter = express.Router();
 
@@ -23,6 +25,6 @@ authRouter.get("/isAuthenticated", userAuth, isAuthenticated);
 authRouter.post("/sendResetOtp", sendResetOtp);
 authRouter.post("/resetPassword", resetPassword);
 authRouter.post("/verifyResetOtp", verifyResetOtp);
-
+authRouter.post("/google-login", googleLogin);
 
 export default authRouter;
