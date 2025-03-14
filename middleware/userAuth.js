@@ -1,22 +1,24 @@
 import jwt from "jsonwebtoken";
 
 const userAuth = async (req, res, next) => {
+    const isAuthCheckEndpoint = req.originalUrl === '/api/auth/isAuthenticated';
     const { token } = req.cookies;
+  
     if (!token) {
-        return res.status(401).json({ success: false, message: "Unauthorized" });
+      return isAuthCheckEndpoint 
+        ? res.status(200).json({ success: false, isLoggedIn: false })
+        : res.status(401).json({ success: false, message: "No token provided" });
     }
-
+  
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.id) {
-            req.user = { id: decoded.id }; // Attach to req.user instead of req.body
-            next();
-        } else {
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        }
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = { id: decoded.id };
+      next();
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+      return isAuthCheckEndpoint
+        ? res.status(200).json({ success: false, isLoggedIn: false })
+        : res.status(401).json({ success: false, message: "Invalid token" });
     }
-};
-
+  };
+  
 export default userAuth;

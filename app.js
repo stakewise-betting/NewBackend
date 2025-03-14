@@ -1,4 +1,3 @@
-
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -17,7 +16,7 @@ app.use(express.json());
 
 const allowedOrigins = ["http://localhost:5173"]; // frontend URL
 app.use(cors({ origin: allowedOrigins, credentials: true })); // Connecting frontend to backend
-app.use(cookieParser());
+app.use(cookieParser()); // Parse cookies
 
 // Ensure COOP is applied after CORS
 app.use((req, res, next) => {
