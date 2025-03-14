@@ -1,11 +1,17 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { ethers } from "ethers";
 import userModel from "../models/userModel.js";
 import transporter from "../config/nodemailer.js";
 import {
   EMAIL_VERIFY_TEMPLATE,
   PASSWORD_RESET_TEMPLATE,
 } from "../config/emailTemplate.js";
+
+import { OAuth2Client } from "google-auth-library";
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const nonces = {}; // Temporary storage for nonces in metamask login
 
 // register controller
 export const register = async (req, res) => {
@@ -27,12 +33,17 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 12); //encrypting the password
 
-    const user = new userModel({ name, email, password: hashedPassword }); //creating a new user
+    const user = new userModel({
+      name,
+      email,
+      password: hashedPassword,
+      authProvider: "credentials",
+    }); //creating a new user
     await user.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
-    }); //creating a token for the user using user id
+    }); //creating a token for the user using user id. acts as a long-lived access token.
 
     res.cookie("token", token, {
       httpOnly: true, //cookie cannot be accessed by client side script
@@ -96,6 +107,133 @@ export const login = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
+};
+
+// Google Login
+export const googleLogin = async (req, res) => {
+  const { token: googleToken } = req.body; // Renamed to avoid conflict
+
+  try {
+    // Verify Google token
+    const ticket = await client.verifyIdToken({
+      idToken: googleToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload) {
+      return res.status(400).json({ success: false, message: "Invalid token" });
+    }
+
+    const { sub, email, name, picture } = payload; // Extract user details
+
+    // Check if user already exists in MongoDB
+    let user = await userModel.findOne({ email });
+
+    if (!user) {
+      // Create new google user in MongoDB if not exists
+      user = new userModel({
+        googleId: sub,
+        email,
+        name,
+        picture,
+        password: null, // No password required for Google auth
+        authProvider: "google",
+      });
+      await user.save();
+    }
+
+    // Generate a JWT for session management
+    const authToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" } // Token expires in 7 days
+    );
+
+    res.cookie("token", authToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Cookie works on HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // Cross-site cookies
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie will be removed after 7 days
+    }); // store the token in a cookie
+
+    res.json({ success: true, user, token: authToken });
+  } catch (error) {
+    console.error("Google login error:", error);
+    res.status(500).json({ success: false, message: "Google login failed" });
+  }
+};
+
+// MetaMask Nonce. (number used once)
+export const metamaskNonce = async (req, res) => {
+  const { address } = req.query;
+  if (!address) return res.status(400).json({ error: "Address is required" });
+
+  const nonce = crypto.randomBytes(16).toString("hex"); // Secure nonce
+  nonces[address] = nonce;
+
+  res.json({ nonce });
+};
+
+// MetaMask Login (Verify signature and issue JWT)
+
+export const metamaskLogin = async (req, res) => {
+  const { address, signature } = req.body;
+  const nonce = nonces[address];
+
+  try {
+    if (!nonce) return res.status(400).json({ error: "Nonce not found" });
+
+    const recoveredAddress = ethers.verifyMessage(nonce, signature);
+    if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+      return res.status(401).json({ error: "Signature verification failed" });
+    }
+
+    // Check if user exists (by wallet_address)
+    let user = await userModel.findOne({ walletAddress: address });
+
+    if (!user) {
+      // Create a new MetaMask user
+      user = new userModel({
+        walletAddress: address,
+        authProvider: "metamask",
+        role: "user",
+        created_at: new Date(),
+      });
+      await user.save();
+    } else {
+      user.last_login = new Date();
+      await user.save();
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Cookie works on HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // Cross-site cookies
+      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie will be removed after 7 days
+    }); // store the token in a cookie
+
+    delete nonces[address];
+
+    res.json({ success: true, user, token });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// MetaMask Protected Route
+export const metamaskProtected = async (req, res) => {
+  const token = req.cookies.token; // Get token from cookie
+  if (!token) return res.status(403).json({ error: "Unauthorized" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ error: "Invalid token" });
+    res.json({ message: "Access granted", user: decoded });
+  });
 };
 
 // logout controller
@@ -189,7 +327,7 @@ export const verifyEmail = async (req, res) => {
 //check if user is authenticated.
 export const isAuthenticated = async (req, res) => {
   try {
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, isLoggedIn: true });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }
@@ -265,7 +403,7 @@ export const verifyResetOtp = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 //Reset user password
 export const resetPassword = async (req, res) => {
@@ -282,7 +420,7 @@ export const resetPassword = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found" });
     }
-   
+
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     user.password = hashedPassword;
     await user.save();
