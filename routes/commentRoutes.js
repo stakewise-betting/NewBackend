@@ -37,30 +37,37 @@ router.post("/", async (req, res) => {
 // Like a comment
 router.post("/like/:commentId", async (req, res) => {
     try {
+        const { userId } = req.body; // Get userId from request body
         const comment = await Comment.findById(req.params.commentId);
         if (!comment) return res.status(404).json({ message: "Comment not found" });
 
-        comment.likes += 1;
+        if (!comment.likedBy.includes(userId)) {
+            comment.likedBy.push(userId);
+            comment.likes += 1;
+        }
         await comment.save();
-        res.json({ likes: comment.likes });
+        res.json({ likes: comment.likes, likedBy: comment.likedBy });
     } catch (error) {
         res.status(500).json({ message: "Error updating like count" });
     }
 });
 
-// Unlike a comment - new route
+// Unlike a comment
 router.post("/unlike/:commentId", async (req, res) => {
     try {
+        const { userId } = req.body;
         const comment = await Comment.findById(req.params.commentId);
         if (!comment) return res.status(404).json({ message: "Comment not found" });
 
-        comment.likes = Math.max(0, comment.likes - 1); // Ensure likes don't go below 0
+        comment.likedBy = comment.likedBy.filter(id => id.toString() !== userId);
+        comment.likes = Math.max(0, comment.likedBy.length); // Ensure likes match likedBy count
         await comment.save();
-        res.json({ likes: comment.likes });
+        res.json({ likes: comment.likes, likedBy: comment.likedBy });
     } catch (error) {
         res.status(500).json({ message: "Error updating like count" });
     }
 });
+
 
 
 // Delete a comment
