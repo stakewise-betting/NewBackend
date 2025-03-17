@@ -6,6 +6,7 @@ import userRouter from "./routes/userRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import userUpdateRouter from "./routes/userUpdateRoutes.js";
 
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/user-update", userUpdateRouter);
 
 export default app;
 
