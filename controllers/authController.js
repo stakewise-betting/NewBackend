@@ -15,9 +15,9 @@ const nonces = {}; // Temporary storage for nonces in metamask login
 
 // register controller
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, email, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (!username || !email || !password) {
     return res
       .status(400)
       .json({ success: false, message: "Please fill all the fields" });
@@ -34,7 +34,7 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 12); //encrypting the password
 
     const user = new userModel({
-      name,
+      username,
       email,
       password: hashedPassword,
       authProvider: "credentials",
@@ -57,7 +57,7 @@ export const register = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "Welcome to STAKEWISE",
-      text: `Hello ${name}, Welcome to STAKEWISE. We are glad to have you with us.`,
+      text: `Hello ${username}, Welcome to STAKEWISE. We are glad to have you with us.`,
     };
     await transporter.sendMail(mailOptions);
 
