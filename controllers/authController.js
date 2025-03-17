@@ -111,7 +111,7 @@ export const login = async (req, res) => {
 
 // Google Login
 export const googleLogin = async (req, res) => {
-  const { token: googleToken } = req.body; // Renamed to avoid conflict
+  const { token: googleToken } = req.body;
 
   try {
     // Verify Google token
@@ -119,42 +119,53 @@ export const googleLogin = async (req, res) => {
       idToken: googleToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
+
     const payload = ticket.getPayload();
     if (!payload) {
       return res.status(400).json({ success: false, message: "Invalid token" });
     }
 
-    const { sub, email, name, picture } = payload; // Extract user details
+    const { sub, email, name, picture } = payload;
 
-    // Check if user already exists in MongoDB
+    // Ensure name is split properly
+    const nameParts = name ? name.split(" ") : ["Unknown"];
+    const fname = nameParts[0] || "Unknown";
+    const lname = nameParts.slice(1).join(" ") || "User";
+    const username = email ? email.split("@")[0] : `user_${sub}`;
+
+    // Check if user already exists
     let user = await userModel.findOne({ email });
 
     if (!user) {
-      // Create new google user in MongoDB if not exists
+      // Create new user if not found
       user = new userModel({
         googleId: sub,
         email,
-        name,
+        fname,
+        lname,
+        username,
         picture,
         password: null, // No password required for Google auth
         authProvider: "google",
       });
+
       await user.save();
     }
 
-    // Generate a JWT for session management
+    // Generate JWT
     const authToken = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" } // Token expires in 7 days
+      { expiresIn: "7d" }
     );
 
+    // Set HTTP-only cookie for authentication
     res.cookie("token", authToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Cookie works on HTTPS
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", // Cross-site cookies
-      maxAge: 7 * 24 * 60 * 60 * 1000, // Cookie will be removed after 7 days
-    }); // store the token in a cookie
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.json({ success: true, user, token: authToken });
   } catch (error) {

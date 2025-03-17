@@ -1,7 +1,15 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    name: {
+    fname: {
+        type: String,
+        required: function () { return !this.walletAddress; } // Required for non-MetaMask users
+    },
+    lname: {
+        type: String,
+        required: function () { return !this.walletAddress; } // Required for non-MetaMask users
+    },
+    username: {
         type: String,
         required: function () { return !this.walletAddress; } // Required for non-MetaMask users
     },
@@ -22,6 +30,26 @@ const userSchema = new mongoose.Schema({
     picture: {
         type: String,
         default: '' // Google profile picture
+    },
+    avatarSrc: {
+        type: String,
+        default: ''
+    },
+    birthday:{
+        type: Date,
+        default: null
+    },
+    gender:{
+        type: String,
+        default: null
+    },
+    phone:{
+        type: String,
+        default: null
+    },
+    country:{
+        type: String,
+        default: null
     },
     walletAddress: {
         type: String,
