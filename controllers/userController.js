@@ -1,3 +1,4 @@
+import { auth } from "google-auth-library";
 import userModel from "../models/userModel.js";
 
 export const getUserData = async (req, res) => {
@@ -6,7 +7,7 @@ export const getUserData = async (req, res) => {
 
     const user = await userModel
       .findById(req.user.id)
-      .select("name email isAccountVerified");
+      .select("_id fname lname username email isAccountVerified picture walletAddress authProvider phone country birthday gender avatarSrc");
 
     if (!user) {
       return res
@@ -17,10 +18,20 @@ export const getUserData = async (req, res) => {
     return res.status(200).json({
       success: true,
       userData: {
-        _id: user._id,
-        name: user.name,
+        id: user._id,
+        fname: user.fname,
+        lname: user.lname,
+        username: user.username,
         email: user.email,
+        picture: user.picture,
+        authProvider: user.authProvider,
+        walletAddress: user.walletAddress,
         isAccountVerified: user.isAccountVerified,
+        phone: user.phone,
+        country: user.country,
+        birthday: user.birthday,
+        gender: user.gender,
+        avatarSrc: user.avatarSrc,
       },
     });
   } catch (error) {

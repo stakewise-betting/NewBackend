@@ -1,11 +1,3 @@
-
-// const http = require('http');
-// const mongoose = require('mongoose');
-// const app = require('./app'); // Import the Express app
-// const config = require('./config/config');
-// const websocketService = require('./services/websocketService');
-// const blockchainService = require('./services/blockchainService');
-
 import mongoose from 'mongoose';
 import "dotenv/config";
 import app from './app.js';
@@ -16,6 +8,7 @@ import http from 'http';
 
 
 const server = http.createServer(app);
+
 
 // Initialize WebSocket
 initializeWebSocket(server);
@@ -33,4 +26,3 @@ mongoose.connect(config.mongodbUri)
         });
     })
     .catch(err => console.error('MongoDB Connection Error:', err));
-
