@@ -1,19 +1,20 @@
-// controllers/eventController.js
-
 import EventModel from "../models/event.js";
+import NotificationModel from "../models/notification.js";
+import User from "../models/userModel.js";
+import { io } from "../server.js"; // ✅ Correct import, no need to pass io as a parameter
 
 export const createEvent = async (req, res) => {
-
     try {
         const eventData = req.body;
+        const users = await User.find({}, "_id"); // Get only user IDs
 
-        console.log("Received eventData in /api/events:", eventData);
-        console.log("eventData.eventId:", eventData.eventId);
+        console.log("Received eventData:", eventData);
 
         const newEvent = new EventModel({
             eventId: eventData.eventId,
             name: eventData.name,
             description: eventData.description,
+            rules: eventData.rules,
             imageURL: eventData.imageURL,
             startTime: eventData.startTime,
             endTime: eventData.endTime,
@@ -23,12 +24,27 @@ export const createEvent = async (req, res) => {
         });
 
         await newEvent.save();
-        console.log('Event saved to MongoDB:', newEvent);
-        res.status(201).send({ message: 'Event saved to MongoDB', eventId: eventData.eventId });
-    } catch (error) {
-        console.error('Error saving event to MongoDB:', error);
+        console.log('Event saved:', newEvent);
 
-        res.status(500).send({ message: 'Failed to save event to MongoDB', error });
+        // ✅ Insert ONE notification for ALL users
+        const newNotification = new NotificationModel({
+            userIds: users.map(user => user._id), // ✅ Store all user IDs in one document
+            message: `New Event Created: ${eventData.notificationMessage}`,
+            image: eventData.notificationImageURL
+        });
+
+        await newNotification.save();
+        console.log("Notification saved:", newNotification);
+
+        // ✅ Emit notification to all users
+        users.forEach(user => {
+            io.to(user._id.toString()).emit("new_notification", `New Event: ${eventData.notificationMessage}`);
+        });
+
+        res.status(201).json({ success: true, message: 'Event created and notifications sent!', eventId: eventData.eventId });
+
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to save event', error });
     }
 };
-

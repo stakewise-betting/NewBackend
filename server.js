@@ -5,11 +5,13 @@ import config from './config/config.js';
 import {initializeWebSocket} from './services/websocketService.js'
 import {setupBlockchainListeners} from './services/blockchainService.js'
 import http from 'http';
+import { Server } from "socket.io";
 
 
 const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
-
+export { io }; 
 // Initialize WebSocket
 initializeWebSocket(server);
 
