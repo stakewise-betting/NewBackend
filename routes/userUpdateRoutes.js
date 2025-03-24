@@ -4,13 +4,11 @@ import {
   updatelname,
   updateUsername,
 //   updatePassword,
-//   updateEmail,
    updateProfilePicture,
    updateBirthday,
    updateGender,
-//   updatePhone,
-//   updateTimezone,
-//   updateCountry,
+   updatePhone,
+   updateLanguage,
 } from "../controllers/userUpdateController.js";
 import userAuth from "../middleware/userAuth.js";
 import upload from "../middleware/multerConfig.js";
@@ -20,13 +18,11 @@ const userUpdateRouter = express.Router();
 userUpdateRouter.post("/updatefname",userAuth, updatefname);
 userUpdateRouter.post("/updatelname",userAuth, updatelname);
 userUpdateRouter.post("/updateUsername",userAuth, updateUsername);
-// userUpdateRouter.post("/updateEmail", updateEmail);
 // userUpdateRouter.post("/updatePassword", updatePassword);
 userUpdateRouter.post("/updateProfilePicture", userAuth, upload.single("avatar"), updateProfilePicture);
 userUpdateRouter.post("/updateBirthday",userAuth, updateBirthday);
 userUpdateRouter.post("/updateGender",userAuth, updateGender);
-// userUpdateRouter.post("/updatePhone", updatePhone);
-// userUpdateRouter.post("/updateTimezone", updateTimezone);
-// userUpdateRouter.post("/updateCountry", updateCountry);
+userUpdateRouter.post("/updatePhone", userAuth, updatePhone);
+userUpdateRouter.post("/updateLanguage", userAuth, updateLanguage);
 
 export default userUpdateRouter;

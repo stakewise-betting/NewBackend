@@ -94,20 +94,24 @@ export const updateBirthday = async (req, res) => {
 export const updateProfilePicture = async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ success: false, message: "No file uploaded" });
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
     }
 
     const user = await userModel.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // Deleting the previous image from Cloudinary
     if (user.avatarSrc) {
       const avatarUrl = user.avatarSrc;
-      
-      const urlParts = avatarUrl.split('/');
-      const publicIdWithExtension = urlParts[urlParts.length - 1].split('.')[0];
+
+      const urlParts = avatarUrl.split("/");
+      const publicIdWithExtension = urlParts[urlParts.length - 1].split(".")[0];
       const publicId = `profile_pictures/${publicIdWithExtension}`;
 
       await cloudinary.uploader.destroy(publicId); // Delete the previous image from Cloudinary
@@ -122,7 +126,7 @@ export const updateProfilePicture = async (req, res) => {
         overwrite: true,
         transformation: [{ width: 400, height: 400, crop: "fill" }],
         timeout: 60000,
-        resource_type: 'auto',
+        resource_type: "auto",
       }
     );
 
@@ -139,3 +143,41 @@ export const updateProfilePicture = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const updatePhone = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    const user = await userModel.findById(req.user.id);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    user.phone = phone;
+    await user.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Phone number updated successfully" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateLanguage = async (req, res) => {
+  try {
+    const { language } = req.body;
+    const user
+      = await userModel.findById(req.user.id);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    user.language = language;
+    await user.save(); 
+    res
+      .status(200)
+      .json({ success: true, message: "Language updated successfully" });
+  }
+  catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
