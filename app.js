@@ -23,6 +23,7 @@ app.use(cookieParser()); // Parse cookies
 // Ensure COOP is applied after CORS
 app.use((req, res, next) => {
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    console.log(`Incoming request: ${req.method} ${req.url}`); // Log incoming requests
     next();
 });
 

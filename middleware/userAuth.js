@@ -11,8 +11,8 @@ const userAuth = async (req, res, next) => {
     }
   
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = { id: decoded.id };
+      const decoded = jwt.verify(token, process.env.JWT_SECRET); 
+      req.user = { id: decoded.id }; // set the user id in the request object
       next();
     } catch (error) {
       return isAuthCheckEndpoint

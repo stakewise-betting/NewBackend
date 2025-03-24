@@ -16,7 +16,6 @@ import {
 } from "../controllers/authController.js";
 import userAuth from "../middleware/userAuth.js";
 
-
 const authRouter = express.Router();
 
 authRouter.post("/register", register);
