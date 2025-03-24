@@ -23,8 +23,9 @@ router.post("/", async (req, res) => {
 
         const user = await User.findById(userId); // Fetch user from database using userId
         if (!user) return res.status(404).json({ message: "User not found" }); // Validate user exists
-        const username = user.name; // Get username from the user object
+        const username = `${user.fname} ${user.lname}`; // Get username from the user object
 
+        
         const comment = new Comment({ betId, userId, username, text }); // Save userId and username
         await comment.save();
         res.status(201).json(comment);
@@ -32,6 +33,7 @@ router.post("/", async (req, res) => {
         console.error("Error adding comment:", error);
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
+    
 });
 
 // Like a comment

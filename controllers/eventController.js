@@ -29,7 +29,7 @@ export const createEvent = async (req, res) => {
         // ✅ Insert ONE notification for ALL users
         const newNotification = new NotificationModel({
             userIds: users.map(user => user._id), // ✅ Store all user IDs in one document
-            message: `New Event Created: ${eventData.notificationMessage}`,
+            message: eventData.notificationMessage || "Default notification message",
             image: eventData.notificationImageURL
         });
 
