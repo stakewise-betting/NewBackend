@@ -1,11 +1,16 @@
 // routes/eventRoutes.js
-
 import express from "express";
-import { createEvent } from "../controllers/eventController.js";
+// Import BOTH controller functions now
+import { createEvent, getEventById } from "../controllers/eventController.js";
 
 const router = express.Router();
 
+// Handles POST /api/events/
 router.post('/', createEvent);
 
-export default router;
+// --- ADD THIS LINE ---
+// Handles GET /api/events/:id (e.g., /api/events/123)
+router.get('/:id', getEventById);
+// --------------------
 
+export default router;
