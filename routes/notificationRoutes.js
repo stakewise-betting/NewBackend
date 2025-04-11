@@ -1,14 +1,10 @@
 // routes/notificationRoutes.js
-
-// const express = require('express');
-// const notificationController = require('../controllers/notificationController');
-
 import express from "express";
-import {sendGenericNotification} from "../controllers/notificationController.js";
+import { sendGenericNotification, getNotifications } from "../controllers/notificationController.js"; // Updated import
 
 const router = express.Router();
 
-router.post('/send',sendGenericNotification); // Changed endpoint to /send to avoid conflict
+router.post('/send', sendGenericNotification);
+router.get('/', getNotifications); // GET route for fetching notifications - using getNotifications
 
 export default router;
-

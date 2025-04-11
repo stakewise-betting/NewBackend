@@ -3,7 +3,7 @@ const config = {
     mongodbUri: process.env.MONGODB_URI,
     port: process.env.PORT || 5000,
     blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-    contractAddress: "0x141C130E983Abda14090B771d251E06E18Df55eD", // Keep contract address here if it's config
+    contractAddress: "0x17aaBF8aa75ff8ee12E641cA768981AcD81Ac933", // Keep contract address here if it's config
     contractABI:  [
       {
         "inputs": [],
@@ -162,7 +162,7 @@ const config = {
           },
           {
             "internalType": "string",
-            "name": "notificationMessage",
+            "name": "rules",
             "type": "string"
           }
         ],
@@ -173,6 +173,20 @@ const config = {
       {
         "inputs": [],
         "name": "nextEventId",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      },
+      {
+        "inputs": [],
+        "name": "totalAdminProfit",
         "outputs": [
           {
             "internalType": "uint256",
@@ -223,7 +237,7 @@ const config = {
           },
           {
             "internalType": "string",
-            "name": "_notificationMessage",
+            "name": "_rules",
             "type": "string"
           }
         ],
@@ -331,7 +345,7 @@ const config = {
           },
           {
             "internalType": "string",
-            "name": "notificationMessage",
+            "name": "rules",
             "type": "string"
           }
         ],
@@ -405,6 +419,20 @@ const config = {
             "internalType": "struct BettingEvents.OptionOdds[]",
             "name": "",
             "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": true
+      },
+      {
+        "inputs": [],
+        "name": "getTotalAdminProfit",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
           }
         ],
         "stateMutability": "view",
