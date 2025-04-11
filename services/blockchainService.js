@@ -46,6 +46,7 @@ const setupBlockchainListeners = () => {
                     // Get all users
                     const users = await User.find({}, "_id");
 
+                    
                     // Create notification in database for all users
                     const newNotification = new NotificationModel({
                         userIds: users.map(user => user._id),

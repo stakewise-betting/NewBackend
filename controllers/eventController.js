@@ -62,7 +62,7 @@ export const createEvent = async (req, res) => {
         if (users && users.length > 0) {
             const newNotification = new NotificationModel({
                 userIds: users.map(user => user._id),
-                message: `New Event: ${eventData.name}. ${eventData.notificationMessage}`, // More descriptive message
+                message: `New Event: ${eventData.notificationMessage}`, // More descriptive message
                 image: eventData.notificationImageURL,
                 relatedEventId: newEvent._id // Link notification to the DB event doc ID (optional)
             });
@@ -75,7 +75,7 @@ export const createEvent = async (req, res) => {
                  // Ensure user._id is valid before emitting
                  if (user && user._id) {
                     io.to(user._id.toString()).emit("new_notification", {
-                        message: `New Event: ${eventData.name}. ${eventData.notificationMessage}`,
+                        message: `New Event: ${eventData.notificationMessage}`,
                         image: eventData.notificationImageURL,
                         eventId: eventData.eventId // Send numeric blockchain event ID if needed by client
                     });
