@@ -14,6 +14,10 @@ const NotificationSchema = new mongoose.Schema({
     image: { 
         type: String 
     },
+    eventId: { 
+        type: Number, 
+        required: true 
+    }, // Assuming eventId is a number
     read: {
         type: Map,
         of: Boolean,
