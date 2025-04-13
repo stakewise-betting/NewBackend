@@ -58,33 +58,33 @@ export const createEvent = async (req, res) => {
         console.log('Event saved to DB:', newEvent._id); // Log MongoDB document ID
 
         // --- Notification Logic ---
-        const users = await User.find({}, "_id"); // Get only user IDs
-        if (users && users.length > 0) {
-            const newNotification = new NotificationModel({
-                userIds: users.map(user => user._id),
-                message: `New Event: ${eventData.notificationMessage}`, // More descriptive message
-                image: eventData.notificationImageURL,
-                relatedEventId: newEvent._id // Link notification to the DB event doc ID (optional)
-            });
+        // const users = await User.find({}, "_id"); // Get only user IDs
+        // if (users && users.length > 0) {
+        //     const newNotification = new NotificationModel({
+        //         userIds: users.map(user => user._id),
+        //         message: `New Event: ${eventData.notificationMessage}`, // More descriptive message
+        //         image: eventData.notificationImageURL,
+        //         relatedEventId: newEvent._id // Link notification to the DB event doc ID (optional)
+        //     });
 
-            await newNotification.save();
-            console.log("Notification saved to DB:", newNotification._id);
+        //     await newNotification.save();
+        //     console.log("Notification saved to DB:", newNotification._id);
 
-            // Emit via Socket.IO
-            users.forEach(user => {
-                 // Ensure user._id is valid before emitting
-                 if (user && user._id) {
-                    io.to(user._id.toString()).emit("new_notification", {
-                        message: `New Event: ${eventData.notificationMessage}`,
-                        image: eventData.notificationImageURL,
-                        eventId: eventData.eventId // Send numeric blockchain event ID if needed by client
-                    });
-                 }
-            });
-             console.log(`Emitted notifications to ${users.length} potential users.`);
-        } else {
-            console.log("No users found to notify.");
-        }
+        //     // Emit via Socket.IO
+        //     users.forEach(user => {
+        //          // Ensure user._id is valid before emitting
+        //          if (user && user._id) {
+        //             io.to(user._id.toString()).emit("new_notification", {
+        //                 message: `New Event: ${eventData.notificationMessage}`,
+        //                 image: eventData.notificationImageURL,
+        //                 eventId: eventData.eventId // Send numeric blockchain event ID if needed by client
+        //             });
+        //          }
+        //     });
+        //      console.log(`Emitted notifications to ${users.length} potential users.`);
+        // } else {
+        //     console.log("No users found to notify.");
+        // }
         // --- End Notification Logic ---
 
         res.status(201).json({ success: true, message: 'Event created and notifications potentially sent!', eventId: newEvent.eventId }); // Return saved eventId

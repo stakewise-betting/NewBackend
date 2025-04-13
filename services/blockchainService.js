@@ -37,11 +37,10 @@ const setupBlockchainListeners = () => {
 
                     console.log('Notification message from contract:', notificationMessage);
 
-                    const eventFromDb = await EventModel.findOne({ eventId: eventIdNumber });
-                    console.log("eventFromDb from MongoDB:", eventFromDb);
 
-                    const notificationImageURL = eventFromDb ? eventFromDb.notificationImageURL : null;
-                    console.log("notificationImageURL from MongoDB:", notificationImageURL);
+                    const notificationImageURL = eventDetails.notificationImageURL;
+                    const eventId = eventDetails.eventId;
+                   
 
                     // Get all users
                     const users = await User.find({}, "_id");
@@ -50,8 +49,9 @@ const setupBlockchainListeners = () => {
                     // Create notification in database for all users
                     const newNotification = new NotificationModel({
                         userIds: users.map(user => user._id),
-                        message: notificationMessage || `New event: ${eventDetails.name}`,
-                        image: notificationImageURL
+                        message: notificationMessage ,
+                        image: notificationImageURL,
+                        eventId: eventId
                     });
 
                     await newNotification.save();

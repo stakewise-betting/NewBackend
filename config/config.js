@@ -3,8 +3,8 @@ const config = {
     mongodbUri: process.env.MONGODB_URI,
     port: process.env.PORT || 5000,
     blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-    contractAddress: "0x5EFEa4fbd783EAa915a8c29ad34b4a45E0444722", // Keep contract address here if it's config
-    contractABI:  [
+    contractAddress: "0xCcb3bE5d0C3b33e19f8F8a38fec1406bDD2b4bD1", // Keep contract address here if it's config
+    contractABI: [
       {
         "inputs": [],
         "stateMutability": "nonpayable",
@@ -164,6 +164,16 @@ const config = {
             "internalType": "string",
             "name": "rules",
             "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "notificationImageURL",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "notificationMessage",
+            "type": "string"
           }
         ],
         "stateMutability": "view",
@@ -239,6 +249,16 @@ const config = {
             "internalType": "string",
             "name": "_rules",
             "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_notificationImageURL",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "_notificationMessage",
+            "type": "string"
           }
         ],
         "name": "createEvent",
@@ -294,59 +314,76 @@ const config = {
         "name": "getEvent",
         "outputs": [
           {
-            "internalType": "uint256",
-            "name": "eventId",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "imageURL",
-            "type": "string"
-          },
-          {
-            "internalType": "string[]",
-            "name": "options",
-            "type": "string[]"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "endTime",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "isCompleted",
-            "type": "bool"
-          },
-          {
-            "internalType": "string",
-            "name": "winningOption",
-            "type": "string"
-          },
-          {
-            "internalType": "uint256",
-            "name": "prizePool",
-            "type": "uint256"
-          },
-          {
-            "internalType": "string",
-            "name": "rules",
-            "type": "string"
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "eventId",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "description",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "imageURL",
+                "type": "string"
+              },
+              {
+                "internalType": "string[]",
+                "name": "options",
+                "type": "string[]"
+              },
+              {
+                "internalType": "uint256",
+                "name": "startTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "endTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "isCompleted",
+                "type": "bool"
+              },
+              {
+                "internalType": "string",
+                "name": "winningOption",
+                "type": "string"
+              },
+              {
+                "internalType": "uint256",
+                "name": "prizePool",
+                "type": "uint256"
+              },
+              {
+                "internalType": "string",
+                "name": "rules",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "notificationImageURL",
+                "type": "string"
+              },
+              {
+                "internalType": "string",
+                "name": "notificationMessage",
+                "type": "string"
+              }
+            ],
+            "internalType": "struct BettingEvents.BetEventView",
+            "name": "",
+            "type": "tuple"
           }
         ],
         "stateMutability": "view",
