@@ -18,7 +18,8 @@ const eventSchema = new mongoose.Schema({
     options: { type: [String], required: true },
     notificationMessage: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    notificationImageURL: { type: String, required: true }
+    notificationImageURL: { type: String, required: true },
+    category: { type: String, required: true }, // Default category
 
 });
 
