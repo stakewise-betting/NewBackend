@@ -73,6 +73,10 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "moderator"],
       default: "user",
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     verifyOtp: {
       type: String,
       default: "",
