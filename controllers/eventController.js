@@ -5,7 +5,6 @@ import NotificationModel from "../models/notification.js";
 import User from "../models/userModel.js";
 import { io } from "../server.js"; // Assuming io is correctly exported from server.js
 
-// --- Controller to CREATE an event ---
 export const createEvent = async (req, res) => {
     try {
         const eventData = req.body;

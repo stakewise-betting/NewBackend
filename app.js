@@ -8,10 +8,8 @@ import eventRoutes from "./routes/eventRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import commentRoutes from'./routes/commentRoutes.js'; 
 import userUpdateRouter from "./routes/userUpdateRoutes.js";
-import adminRoutes from './routes/adminRoutes.js'; // Adjust path
-// ... other imports and app setup ...
-
- 
+import adminRoutes from './routes/adminRoutes.js';
+// import betsRoutes from './routes/betsRoutes.js';
 
 
 const app = express();
@@ -40,6 +38,8 @@ app.use("/api/user", userRouter);
 app.use("/api/comments", commentRoutes);
 app.use("/api/user-update", userUpdateRouter);
 app.use('/api/admin', adminRoutes);
+// app.use('/api/bets', betsRoutes);
+
 
 export default app;
 
