@@ -6,7 +6,7 @@ const checkUserActive = (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
   
-    if (!user.isActivate) {
+    if (!user.isActive) {
       return res.status(403).json({ message: "Your account is deactivated." });
     }
   
