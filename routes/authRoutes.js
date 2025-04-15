@@ -13,6 +13,10 @@ import {
   metamaskLogin,
   metamaskNonce,
   metamaskProtected,
+  changePassword,
+  deleteAccount,
+  deactivateAccount,
+  activateAccount,
 } from "../controllers/authController.js";
 import userAuth from "../middleware/userAuth.js";
 
@@ -31,6 +35,12 @@ authRouter.post("/google-login", googleLogin);
 authRouter.post("/metamask-login", metamaskLogin);
 authRouter.get("/metamask-nonce", metamaskNonce); // number used once for metamask login
 authRouter.get("/metamask-protected", metamaskProtected); // protected route for metamask login
+authRouter.post("/changePassword", userAuth, changePassword);
+authRouter.post("/deleteAccount", userAuth, deleteAccount)
+authRouter.post("/deactivateAccount", userAuth, deactivateAccount)
+authRouter.post("/activateAccount", userAuth, activateAccount)
+// authRoutes.js
+
 
 
 export default authRouter;
