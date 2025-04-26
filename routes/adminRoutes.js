@@ -8,7 +8,6 @@ import authenticate from "../middleware/userAuth.js"; // Use 'authenticate' to r
 // --- Problem: isAdmin is still missing ---
 // You also need an isAdmin middleware. We'll address this next.
 // For now, let's assume you'll create it.
-import { isAdmin } from "../middleware/adminAuth.js"; // EXAMPLE: Assuming isAdmin is in a separate file
 
 const router = express.Router();
 
