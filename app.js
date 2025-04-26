@@ -9,6 +9,7 @@ import reportRoutes from "./routes/reportRoutes.js";
 import commentRoutes from'./routes/commentRoutes.js'; 
 import userUpdateRouter from "./routes/userUpdateRoutes.js";
 import adminRoutes from './routes/adminRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
 // import betsRoutes from './routes/betsRoutes.js';
 
 
@@ -38,7 +39,7 @@ app.use("/api/user", userRouter);
 app.use("/api/comments", commentRoutes);
 app.use("/api/user-update", userUpdateRouter);
 app.use('/api/admin', adminRoutes);
-// app.use('/api/bets', betsRoutes);
+app.use('/api/contact', contactRoutes);
 
 
 export default app;
