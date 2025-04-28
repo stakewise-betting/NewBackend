@@ -14,10 +14,6 @@ router.get('/deposit-limits', responsibleGamblingController.getDepositLimits);
 router.post('/deposit-limits', responsibleGamblingController.setDepositLimits);
 router.post('/record-bet', userAuth, responsibleGamblingController.recordBet);
 
-// Time-out routes
-router.get('/time-out', responsibleGamblingController.getActiveTimeOut);
-router.post('/time-out', responsibleGamblingController.setTimeOut);
-
 // Self-assessment routes
 router.get('/self-assessment/questions', responsibleGamblingController.getSelfAssessmentQuestions);
 router.post('/self-assessment', responsibleGamblingController.submitSelfAssessment);
