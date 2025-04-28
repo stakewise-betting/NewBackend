@@ -11,6 +11,8 @@ import userUpdateRouter from "./routes/userUpdateRoutes.js";
 import adminRoutes from './routes/adminRoutes.js';
 import watchlistRoutes from './routes/watchlistRoutes.js';
 // import betsRoutes from './routes/betsRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+import responsibleGamblingRoutes from './routes/responsibleGamblingRoutes.js';
 
 
 const app = express();
@@ -42,6 +44,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/watchlist', watchlistRoutes);
 // app.use('/api/bets', betsRoutes);
 
+app.use('/api/contact', contactRoutes);
+app.use('/api/responsible-gambling', responsibleGamblingRoutes);
 
 export default app;
 
