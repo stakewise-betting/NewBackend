@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    language: {
+      type: String,
+      default: "en",
+    },
     birthday: {
       type: Date,
       default: null,
@@ -68,6 +72,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["user", "admin", "moderator"],
       default: "user",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
     verifyOtp: {
       type: String,

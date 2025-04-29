@@ -1,23 +1,30 @@
+// services/websocketService.js
 
 import { WebSocketServer } from 'ws';
-
 
 let wss;
 
 const initializeWebSocket = (server) => {
+    wss = new WebSocketServer({ server });
 
-    wss = new WebSocketServer({ server }); // Use WebSocketServer instead of WebSocket.Server
-
-
-    wss.on('connection', ws => {
+    wss.on('connection', (ws, req) => {
         console.log('Client connected');
+        
+        // Extract user ID from the URL query parameters
+        // Example URL: ws://localhost:5000/?userId=12345
+        const userId = new URL(req.url, 'http://localhost').searchParams.get('userId');
+        
+        if (userId) {
+            ws.userId = userId;
+            console.log(`Client identified with userId: ${userId}`);
+        }
 
-        ws.on('message', message => {
+        ws.on('message', (message) => {
             console.log(`Received message: ${message}`);
+            
+            // Broadcasting logic (if needed)
             wss.clients.forEach(client => {
-
                 if (client !== ws && client.readyState === ws.OPEN) {
-
                     client.send(`Server says: ${message}`);
                 }
             });
@@ -27,14 +34,13 @@ const initializeWebSocket = (server) => {
             console.log('Client disconnected');
         });
 
-        ws.on('error', error => {
+        ws.on('error', (error) => {
             console.error('WebSocket error:', error);
         });
     });
 
     console.log('WebSocket server initialized');
-
-    return wss; // Export wss instance if needed elsewhere
+    return wss;
 };
 
 const getWssInstance = () => {
@@ -44,21 +50,37 @@ const getWssInstance = () => {
     return wss;
 };
 
-
+// Send to all clients
 const sendNotificationToClients = (payload) => {
     if (!wss) {
         console.error("WebSocket server not initialized.");
         return;
     }
+    
     wss.clients.forEach(client => {
-
         if (client.readyState === client.OPEN) {
-
             client.send(JSON.stringify(payload));
         }
     });
 };
 
+// Send to specific user by userId
+const sendNotificationToUser = (userId, payload) => {
+    if (!wss) {
+        console.error("WebSocket server not initialized.");
+        return;
+    }
+    
+    wss.clients.forEach(client => {
+        if (client.readyState === client.OPEN && client.userId === userId) {
+            client.send(JSON.stringify(payload));
+        }
+    });
+};
 
-export { initializeWebSocket, getWssInstance, sendNotificationToClients };
-
+export { 
+    initializeWebSocket, 
+    getWssInstance, 
+    sendNotificationToClients,
+    sendNotificationToUser
+};

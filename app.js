@@ -6,7 +6,13 @@ import userRouter from "./routes/userRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
+import commentRoutes from'./routes/commentRoutes.js'; 
 import userUpdateRouter from "./routes/userUpdateRoutes.js";
+import adminRoutes from './routes/adminRoutes.js';
+import watchlistRoutes from './routes/watchlistRoutes.js';
+// import betsRoutes from './routes/betsRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+import responsibleGamblingRoutes from './routes/responsibleGamblingRoutes.js';
 
 
 const app = express();
@@ -22,6 +28,7 @@ app.use(cookieParser()); // Parse cookies
 // Ensure COOP is applied after CORS
 app.use((req, res, next) => {
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    console.log(`Incoming request: ${req.method} ${req.url}`); // Log incoming requests
     next();
 });
 
@@ -31,7 +38,14 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/report", reportRoutes);
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/comments", commentRoutes);
 app.use("/api/user-update", userUpdateRouter);
+app.use('/api/admin', adminRoutes);
+app.use('/api/watchlist', watchlistRoutes);
+// app.use('/api/bets', betsRoutes);
+
+app.use('/api/contact', contactRoutes);
+app.use('/api/responsible-gambling', responsibleGamblingRoutes);
 
 export default app;
 

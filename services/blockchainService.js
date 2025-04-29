@@ -3,9 +3,10 @@
 import Web3 from 'web3';
 import mongoose from 'mongoose';
 import EventModel from '../models/event.js';
+import NotificationModel from '../models/notification.js';
+import User from '../models/userModel.js';
 import config from '../config/config.js';
-import {sendNotificationToClients} from './websocketService.js';
-
+import { sendNotificationToClients } from './websocketService.js';
 
 let contractBackend;
 
@@ -36,11 +37,25 @@ const setupBlockchainListeners = () => {
 
                     console.log('Notification message from contract:', notificationMessage);
 
-                    const eventFromDb = await EventModel.findOne({ eventId: eventIdNumber });
-                    console.log("eventFromDb from MongoDB:", eventFromDb);
 
-                    const notificationImageURL = eventFromDb ? eventFromDb.notificationImageURL : null;
-                    console.log("notificationImageURL from MongoDB:", notificationImageURL);
+                    const notificationImageURL = eventDetails.notificationImageURL;
+                    const eventId = eventDetails.eventId;
+                   
+
+                    // Get all users
+                    const users = await User.find({}, "_id");
+
+                    
+                    // Create notification in database for all users
+                    const newNotification = new NotificationModel({
+                        userIds: users.map(user => user._id),
+                        message: notificationMessage ,
+                        image: notificationImageURL,
+                        eventId: eventId
+                    });
+
+                    await newNotification.save();
+                    console.log("Notification saved to database:", newNotification);
 
                     const eventDataForNotification = {
                         eventId: eventDetails.eventId,
@@ -51,13 +66,14 @@ const setupBlockchainListeners = () => {
                         notificationImageURL: notificationImageURL
                     };
 
-
+                    // Send notification to all clients
                     sendNotificationToClients({
-
                         type: 'newEvent',
                         notificationMessage: notificationMessage,
                         notificationImageURL: notificationImageURL,
-                        eventData: eventDataForNotification
+                        eventData: eventDataForNotification,
+                        id: newNotification._id.toString(),
+                        timestamp: newNotification.createdAt
                     });
 
                 } catch (error) {
@@ -70,6 +86,4 @@ const setupBlockchainListeners = () => {
         });
 };
 
-
 export { setupBlockchainListeners };
-

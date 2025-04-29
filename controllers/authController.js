@@ -264,10 +264,15 @@ export const logout = async (req, res) => {
 
 //send verification OTP to the user's email
 export const sendVerifyOtp = async (req, res) => {
+
   try {
-    const { userId } = req.body;
+    const userId = req.user.id;
 
     const user = await userModel.findById(userId); //finding the user by id
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
     if (user.isAccountVerified) {
       return res
         .status(400)
@@ -302,10 +307,12 @@ export const sendVerifyOtp = async (req, res) => {
 
 //verify Email
 export const verifyEmail = async (req, res) => {
-  const { userId, otp } = req.body;
 
-  if (!userId || !otp) {
-    return res.status(400).json({ success: false, message: "Missing details" });
+  const userId = req.user.id;
+  const { otp } = req.body;
+
+  if (!otp) {
+    return res.status(400).json({ success: false, message: "OTP is required" });
   }
 
   try {
@@ -442,3 +449,113 @@ export const resetPassword = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// Change password endpoint
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.user.id;
+
+    // Validate new password and confirm password match
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: 'New password and confirm password do not match' });
+    }
+
+    // Fetch user from database
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Handle password change logic
+    if (user.password) {
+      // User has a password; verify currentPassword
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Current password is incorrect' });
+      }
+    }
+    // If user.password is null (e.g., Google login), proceed without verification
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// delete account
+export const deleteAccount = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    await userModel.deleteOne({ _id: userId }); //deleting the user
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
+
+    return res.status(200).json({ success: true, message: "Account deleted" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+// deactivate account
+export const deactivateAccount = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.isActive = false; //deactivating the account
+    await user.save();
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+    });
+
+    return res.status(200).json({ success: true, message: "Account deactivated" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+//activate account
+export const activateAccount = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.isActive = true; //activating the account
+    await user.save();
+
+    return res.status(200).json({ success: true, message: "Account activated" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
