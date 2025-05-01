@@ -9,6 +9,7 @@ import {
    updateGender,
    updatePhone,
    updateLanguage,
+   updateProfile,
 } from "../controllers/userUpdateController.js";
 import userAuth from "../middleware/userAuth.js";
 import upload from "../middleware/multerConfig.js";
@@ -25,6 +26,7 @@ userUpdateRouter.post("/updateBirthday", userAuth, checkUserActive, updateBirthd
 userUpdateRouter.post("/updateGender", userAuth, checkUserActive, updateGender);
 userUpdateRouter.post("/updatePhone", userAuth, checkUserActive, updatePhone);
 userUpdateRouter.post("/updateLanguage", userAuth, checkUserActive, updateLanguage);
+userUpdateRouter.put('/profile', userAuth, checkUserActive, updateProfile);
 
 
 export default userUpdateRouter;

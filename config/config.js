@@ -3,7 +3,7 @@ const config = {
   mongodbUri: process.env.MONGODB_URI,
   port: process.env.PORT || 5000,
   blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-  contractAddress: "0xAb755c52D45C08D2C136687E8eCb1743c3aeE9Dd", // Keep contract address here if it's config
+  contractAddress: "0x4c34A81199d29568e08D2E7a7aaf1606e40287b1", // Keep contract address here if it's config
   contractABI: [
     {
       "inputs": [],
@@ -534,6 +534,20 @@ const config = {
     {
       "inputs": [],
       "name": "getTotalAdminProfit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "getTotalBetsPlaced",
       "outputs": [
         {
           "internalType": "uint256",
