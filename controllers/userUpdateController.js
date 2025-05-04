@@ -181,3 +181,49 @@ export const updateLanguage = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
+export const updateProfile = async (req, res) => {
+  const userId = req.user._id; // Get user ID from authenticated token
+  const { fname, lname, username } = req.body; // Destructure expected fields
+
+  // Validation (ensure username is provided)
+  if (!username || typeof username !== 'string' || username.trim().length === 0) {
+      return res.status(400).json({ success: false, message: 'Username is required.' });
+  }
+
+  try {
+      const user = await userModel.findById(userId);
+       if (!user) {
+           return res.status(404).json({ success: false, message: 'User not found.' });
+       }
+
+       // Update fields directly on the fetched user object
+       user.username = username.trim();
+       user.fname = fname === '' ? null : (fname || user.fname); // Update if provided, allow clearing, else keep original
+       user.lname = lname === '' ? null : (lname || user.lname); // Update if provided, allow clearing, else keep original
+
+       // Add validation checks if needed (e.g., username regex, length) before saving
+
+      const updatedUser = await user.save(); // Use save() to trigger Mongoose validation/middleware
+
+      // Exclude sensitive fields before sending back
+      const userToSend = updatedUser.toObject(); // Convert to plain object
+      delete userToSend.password;
+      delete userToSend.verifyOtp;
+      // ... delete other sensitive fields ...
+
+      res.status(200).json({ success: true, message: 'Profile updated successfully.', user: userToSend });
+
+  } catch (error) {
+      console.error("Error updating user profile:", error);
+      if (error.code === 11000 && error.keyPattern?.username) {
+          return res.status(400).json({ success: false, message: 'Username is already taken.' });
+      }
+       if (error.name === 'ValidationError') {
+          // Handle Mongoose validation errors
+          const messages = Object.values(error.errors).map((el) => el.message);
+          return res.status(400).json({ success: false, message: messages.join('. ') });
+      }
+      res.status(500).json({ success: false, message: 'Error updating profile.', error: error.message });
+  }
+};
