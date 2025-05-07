@@ -3,7 +3,7 @@ const config = {
   mongodbUri: process.env.MONGODB_URI,
   port: process.env.PORT || 5000,
   blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-  contractAddress: "0xA5FfC27f1F6F5AC53aA94848944AfBC3CF73D552", // Keep contract address here if it's config
+  contractAddress: "0x285D71352c9e1DDA5904316C1D0B09bd0CB9035C", // Keep contract address here if it's config
   contractABI: [
     {
       inputs: [],
@@ -541,10 +541,24 @@ const config = {
           type: "uint256",
         },
       ],
-      stateMutability: "view",
-      type: "function",
-      constant: true,
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
     },
+    {
+      "inputs": [],
+      "name": "getTotalBetsPlaced",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    }
   ],
 };
 
