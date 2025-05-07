@@ -1,9 +1,15 @@
 // routes/notificationRoutes.js
-const express = require('express');
-const notificationController = require('../controllers/notificationController');
+import express from "express";
+// Import the new controller function
+import { getNotifications, markNotificationsAsRead } from "../controllers/notificationController.js";
 
 const router = express.Router();
 
-router.post('/send', notificationController.sendGenericNotification); // Changed endpoint to /send to avoid conflict
+// Existing route to get notifications
+router.get('/', getNotifications);
 
-module.exports = router;
+// *** NEW ROUTE ***
+// Route to mark notifications as read
+router.post('/read', markNotificationsAsRead); // Use POST as it changes state
+
+export default router;
