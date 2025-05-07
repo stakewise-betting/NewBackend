@@ -7,7 +7,7 @@ export const getUserData = async (req, res) => {
 
     const user = await userModel
       .findById(req.user.id)
-      .select("_id fname lname username email isAccountVerified picture walletAddress authProvider phone country birthday gender avatarSrc language isActive");
+      .select("_id fname lname username email isAccountVerified picture walletAddress authProvider phone country birthday gender avatarSrc language isActive role");
 
     if (!user) {
       return res
@@ -34,6 +34,7 @@ export const getUserData = async (req, res) => {
         avatarSrc: user.avatarSrc,
         language: user.language,
         isActive: user.isActive,
+        role: user.role,
       },
     });
   } catch (error) {
