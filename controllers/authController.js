@@ -41,6 +41,7 @@ export const register = async (req, res) => {
     }); //creating a new user
     await user.save();
 
+    console.log('login123')
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     }); //creating a token for the user using user id. acts as a long-lived access token.
@@ -91,6 +92,7 @@ export const login = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid password" });
     }
+    console.log('loh')
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
@@ -153,11 +155,9 @@ export const googleLogin = async (req, res) => {
     }
 
     // Generate JWT
-    const authToken = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const authToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     // Set HTTP-only cookie for authentication
     res.cookie("token", authToken, {
@@ -264,14 +264,15 @@ export const logout = async (req, res) => {
 
 //send verification OTP to the user's email
 export const sendVerifyOtp = async (req, res) => {
-
   try {
     const userId = req.user.id;
 
     const user = await userModel.findById(userId); //finding the user by id
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
     if (user.isAccountVerified) {
       return res
@@ -307,7 +308,6 @@ export const sendVerifyOtp = async (req, res) => {
 
 //verify Email
 export const verifyEmail = async (req, res) => {
-
   const userId = req.user.id;
   const { otp } = req.body;
 
@@ -458,13 +458,15 @@ export const changePassword = async (req, res) => {
 
     // Validate new password and confirm password match
     if (newPassword !== confirmPassword) {
-      return res.status(400).json({ message: 'New password and confirm password do not match' });
+      return res
+        .status(400)
+        .json({ message: "New password and confirm password do not match" });
     }
 
     // Fetch user from database
     const user = await userModel.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Handle password change logic
@@ -472,7 +474,9 @@ export const changePassword = async (req, res) => {
       // User has a password; verify currentPassword
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
-        return res.status(401).json({ message: 'Current password is incorrect' });
+        return res
+          .status(401)
+          .json({ message: "Current password is incorrect" });
       }
     }
     // If user.password is null (e.g., Google login), proceed without verification
@@ -485,10 +489,10 @@ export const changePassword = async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    res.json({ message: 'Password updated successfully' });
+    res.json({ message: "Password updated successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -499,7 +503,9 @@ export const deleteAccount = async (req, res) => {
   try {
     const user = await userModel.findById(userId);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     await userModel.deleteOne({ _id: userId }); //deleting the user
@@ -514,7 +520,7 @@ export const deleteAccount = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 // deactivate account
 export const deactivateAccount = async (req, res) => {
@@ -523,7 +529,9 @@ export const deactivateAccount = async (req, res) => {
   try {
     const user = await userModel.findById(userId);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     user.isActive = false; //deactivating the account
@@ -535,11 +543,13 @@ export const deactivateAccount = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     });
 
-    return res.status(200).json({ success: true, message: "Account deactivated" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Account deactivated" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 
 //activate account
 export const activateAccount = async (req, res) => {
@@ -548,14 +558,18 @@ export const activateAccount = async (req, res) => {
   try {
     const user = await userModel.findById(userId);
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     user.isActive = true; //activating the account
     await user.save();
 
-    return res.status(200).json({ success: true, message: "Account activated" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Account activated" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
