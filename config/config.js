@@ -3,7 +3,7 @@ const config = {
   mongodbUri: process.env.MONGODB_URI,
   port: process.env.PORT || 5000,
   blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-  contractAddress: "0x568EbB6d5b9afd40e91C3eB0cFe1d33a2A302503", // Keep contract address here if it's config
+  contractAddress: "0x0634D5bf9Ea79855B5DC67b388a4a01c16F8a845", // Keep contract address here if it's config
   contractABI: [
     {
       inputs: [],
