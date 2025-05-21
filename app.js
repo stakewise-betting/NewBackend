@@ -13,6 +13,8 @@ import watchlistRoutes from './routes/watchlistRoutes.js';
 // import betsRoutes from './routes/betsRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
 import responsibleGamblingRoutes from './routes/responsibleGamblingRoutes.js';
+import resultRoutes from "./routes/resultRoutes.js";
+import newsRoutes from "./routes/newsRoutes.js";
 
 
 const app = express();
@@ -46,6 +48,8 @@ app.use('/api/watchlist', watchlistRoutes);
 
 app.use('/api/contact', contactRoutes);
 app.use('/api/responsible-gambling', responsibleGamblingRoutes);
+app.use('/api/results',resultRoutes);
+app.use('/api/news', newsRoutes);
 
 export default app;
 
