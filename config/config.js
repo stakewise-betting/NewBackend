@@ -1,4 +1,4 @@
-// config/config.js
+//NewBackend/config/config.js
 const config = {
   mongodbUri: process.env.MONGODB_URI,
   port: process.env.PORT || 5000,
@@ -560,6 +560,6 @@ const config = {
       constant: true,
     },
   ],
-};
+}; 
 
 export default config;
