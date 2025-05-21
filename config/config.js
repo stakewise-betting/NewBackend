@@ -1,9 +1,9 @@
-// config/config.js
+//NewBackend/config/config.js
 const config = {
   mongodbUri: process.env.MONGODB_URI,
   port: process.env.PORT || 5000,
   blockchainProviderUrl: process.env.BLOCKCHAIN_PROVIDER_URL,
-  contractAddress: "0x756CE741a62aCf7570A08f2114Df1357B0519574", // Keep contract address here if it's config
+  contractAddress: "0x9dF933C367a517db0360c35Eaf6ac9BEe4d6D245", // Keep contract address here if it's config
   contractABI: [
     {
       "inputs": [],
@@ -560,6 +560,6 @@ const config = {
       "constant": true
     }
   ],
-};
+}; 
 
 export default config;
