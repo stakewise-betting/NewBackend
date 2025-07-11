@@ -1,5 +1,4 @@
 // controllers/contactController.js
-// have  to implement admin function with fronend.now work only user function
 import { validationResult } from "express-validator";
 import Contact from "../models/contactModel.js";
 import { sendEmail } from "../config/nodemailer.js";
