@@ -4,6 +4,7 @@ import app from "./app.js";
 import config from "./config/config.js";
 import { initializeWebSocket } from "./services/websocketService.js";
 import { setupBlockchainListeners } from "./services/blockchainService.js";
+import statsScheduler from "./services/statsScheduler.js";
 import http from "http";
 import { Server } from "socket.io";
 
@@ -22,6 +23,9 @@ mongoose
 
     // Setup Blockchain Event Listeners AFTER MongoDB connection is established
     setupBlockchainListeners();
+
+    // Start the stats scheduler
+    statsScheduler.startScheduler();
 
     server.listen(config.port, () => {
       console.log(`Server started on port ${config.port}`);
