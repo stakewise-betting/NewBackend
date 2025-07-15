@@ -13,7 +13,7 @@ const router = express.Router();
 // All routes require authentication and active account
 // Apply the userAuth middleware to all watchlist routes first.
 router.use(userAuth);
-// Then, apply checkUserActive to ensure the authenticated user is active.
+// Apply checkUserActive to ensure the authenticated user is active.
 router.use(checkUserActive);
 
 // Watchlist routes
