@@ -29,9 +29,8 @@ const allowedOrigins = ["http://localhost:5173"]; // frontend URL
 app.use(cors({ origin: allowedOrigins, credentials: true })); // Connecting frontend to backend
 app.use(cookieParser()); // Parse cookies
 
-// Ensure COOP is applied after CORS
+// Request logging middleware
 app.use((req, res, next) => {
-    res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
     console.log(`Incoming request: ${req.method} ${req.url}`); // Log incoming requests
     next();
 });
