@@ -1,4 +1,3 @@
-// middleware/checkUserActive.js
 const checkUserActive = (req, res, next) => {
     const user = req.user; // user should be added in userAuth middleware
   
