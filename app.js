@@ -49,7 +49,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin','user-id'],
   optionsSuccessStatus: 200 // For legacy browser support
 })); // Connecting frontend to backend
 app.use(cookieParser()); // Parse cookies
