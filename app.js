@@ -25,7 +25,7 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = ["http://localhost:5173"]; // frontend URL
+const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:5173"]; // frontend URL
 app.use(cors({ origin: allowedOrigins, credentials: true })); // Connecting frontend to backend
 app.use(cookieParser()); // Parse cookies
 

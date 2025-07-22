@@ -12,7 +12,9 @@ const initializeWebSocket = (server) => {
 
     // Extract user ID from the URL query parameters
     // Example URL: ws://localhost:5000/?userId=12345
-    const userId = new URL(req.url, "http://localhost").searchParams.get(
+    const protocol = req.headers['x-forwarded-proto'] || (req.connection.encrypted ? 'https' : 'http');
+    const host = req.headers.host || 'localhost';
+    const userId = new URL(req.url, `${protocol}://${host}`).searchParams.get(
       "userId"
     );
 
