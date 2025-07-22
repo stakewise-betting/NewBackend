@@ -92,20 +92,37 @@ export const login = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Invalid password" });
     }
-    console.log('loh')
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     }); //creating a token for the user using user id
 
-    res.cookie("token", token, {
-      httpOnly: true, //cookie cannot be accessed by client side script
-      secure: process.env.NODE_ENV === "production", //cookie works on https
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict", //cross site cookies
-      maxAge: 7 * 24 * 60 * 60 * 1000, //cookie will be removed after 7 days
-    }); //setting the token in cookie
+    // Enhanced cookie settings for cross-origin
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/', // Ensure cookie is available for all paths
+    };
 
-    return res.status(200).json({ success: true, user });
+    console.log('🔑 Login successful for:', user.email);
+    console.log('🍪 Setting cookie with options:', cookieOptions);
+    console.log('🌐 Request origin:', req.get('origin'));
+
+    res.cookie("token", token, cookieOptions);
+
+    return res.status(200).json({ 
+      success: true, 
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        fname: user.fname,
+        lname: user.lname
+      },
+      message: "Login successful"
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

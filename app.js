@@ -25,14 +25,50 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = [process.env.FRONTEND_URL || "http://localhost:5173"]; // frontend URL
-app.use(cors({ origin: allowedOrigins, credentials: true })); // Connecting frontend to backend
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "http://localhost:5173",
+  "http://localhost:5173", // Keep for development
+  "https://stakewise-7yto.onrender.com" // Your production frontend
+]; 
+
+// Debug CORS
+console.log('🌐 Allowed origins:', allowedOrigins);
+console.log('🌐 Frontend URL from env:', process.env.FRONTEND_URL);
+
+app.use(cors({ 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.error('❌ CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200 // For legacy browser support
+})); // Connecting frontend to backend
 app.use(cookieParser()); // Parse cookies
 
 // Request logging middleware
 app.use((req, res, next) => {
-    console.log(`Incoming request: ${req.method} ${req.url}`); // Log incoming requests
+    console.log(`📍 ${req.method} ${req.url} from origin: ${req.get('origin')}`);
+    console.log(`🍪 Request cookies:`, req.cookies);
     next();
+});
+
+// Debug endpoint to test cookie handling
+app.get('/api/debug/cookies', (req, res) => {
+    res.json({
+        cookies: req.cookies,
+        headers: req.headers,
+        origin: req.get('origin'),
+        userAgent: req.get('user-agent')
+    });
 });
 
 // API Endpoints (Routes)
