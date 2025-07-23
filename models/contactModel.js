@@ -1,7 +1,5 @@
-// File: models/contactModel.js
 import mongoose from 'mongoose';
 
-// Schema for contact
 const contactSchema = new mongoose.Schema(
   {
     fullname: {
@@ -40,7 +38,6 @@ const contactSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      // Not required as guests can submit contact forms
     },
   },
   { timestamps: true }

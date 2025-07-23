@@ -3,7 +3,7 @@ import userModel from "../models/userModel.js";
 
 export const getUserData = async (req, res) => {
   try {
-    console.log("User ID from middleware:", req.user.id); // Debugging log
+    console.log("User ID from middleware:", req.user.id);
 
     const user = await userModel
       .findById(req.user.id)
@@ -38,7 +38,7 @@ export const getUserData = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching user data:", error); // Log error for debugging
+    console.error("Error fetching user data:", error); 
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });

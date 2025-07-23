@@ -16,6 +16,8 @@ import responsibleGamblingRoutes from './routes/responsibleGamblingRoutes.js';
 import resultRoutes from "./routes/resultRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import raffleRoutes from "./routes/raffleRoutes.js";
+import leaderboardRoutes from "./routes/leaderboardRoutes.js";
+import interestRoutes from './routes/interests.js';
 
 
 const app = express();
@@ -52,6 +54,8 @@ app.use('/api/responsible-gambling', responsibleGamblingRoutes);
 app.use('/api/results',resultRoutes);
 app.use('/api/news', newsRoutes);
 app.use("/api/raffles", raffleRoutes);
+app.use("/api", leaderboardRoutes);
+app.use('/api/interests', interestRoutes);
 
 export default app;
 
