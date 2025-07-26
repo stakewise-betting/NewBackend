@@ -17,6 +17,7 @@ import resultRoutes from "./routes/resultRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
 import raffleRoutes from "./routes/raffleRoutes.js";
 import leaderboardRoutes from "./routes/leaderboardRoutes.js";
+import sliderRoutes from "./routes/sliderRoutes.js";
 
 
 const app = express();
@@ -81,6 +82,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/user-update", userUpdateRouter);
 app.use('/api/admin', adminRoutes);
 app.use('/api/watchlist', watchlistRoutes);
+app.use("/api/sliders", sliderRoutes);
 // app.use('/api/bets', betsRoutes);
 
 app.use('/api/contact', contactRoutes);

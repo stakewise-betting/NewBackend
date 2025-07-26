@@ -64,3 +64,62 @@ export const getResultByEventId = async (req, res) => {
     res.status(500).json({ error: "Server error", details: error.message });
   }
 };
+
+// Add this new function to resultController.js
+export const saveBatchResults = async (req, res) => {
+  try {
+    const { results } = req.body; // Expecting an array of result objects
+    
+    if (!results || !Array.isArray(results)) {
+      return res.status(400).json({ error: "Results array is required" });
+    }
+
+    const savedResults = [];
+    const skippedResults = [];
+
+    for (const resultData of results) {
+      const { eventId, name, category, winner, prizepool } = resultData;
+
+      // Validate required fields
+      if (!eventId || !name || !category || !winner || prizepool === undefined) {
+        skippedResults.push({ eventId, reason: "Missing required fields" });
+        continue;
+      }
+
+      // Check if result already exists
+      const existingResult = await ResultModel.findOne({ eventId });
+      if (existingResult) {
+        skippedResults.push({ eventId, reason: "Already exists" });
+        continue;
+      }
+
+      // Create new result
+      const result = new ResultModel({
+        eventId,
+        name,
+        category,
+        winner,
+        prizepool,
+      });
+
+      try {
+        const savedResult = await result.save();
+        savedResults.push(savedResult);
+      } catch (error) {
+        skippedResults.push({ eventId, reason: error.message });
+      }
+    }
+
+    res.status(201).json({
+      message: `Processed ${results.length} results`,
+      saved: savedResults.length,
+      skipped: skippedResults.length,
+      savedResults,
+      skippedResults
+    });
+
+  } catch (error) {
+    console.error("Error saving batch results:", error);
+    res.status(500).json({ error: "Server error", details: error.message });
+  }
+};
