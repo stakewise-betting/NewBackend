@@ -1,6 +1,8 @@
+// module: NewBackend/routes/raffleRoutes.js
 import express from "express";
 import multer from "multer";
 import authenticate from "../middleware/userAuth.js";
+import adminAuth from "../middleware/adminAuth.js"; // Import admin auth
 import { 
   createRaffle, 
   getAllRaffles, 

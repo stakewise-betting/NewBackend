@@ -7,8 +7,6 @@ const adminAuth = (req, res, next) => {
       message: 'Access denied. Admin privileges required.',
     });
   }
-  
   next();
 };
-
 export default adminAuth;
