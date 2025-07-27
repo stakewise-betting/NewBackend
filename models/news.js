@@ -13,9 +13,14 @@ const newsSchema = new mongoose.Schema({
   author: { type: String, default: "Admin" },
   publishDate: { type: Date, default: Date.now },
   image: {
-    data: Buffer,
-    contentType: String,
-    filename: String
+    public_id: {
+      type: String,
+      required: false
+    },
+    url: {
+      type: String,
+      required: false
+    }
   }
 });
 
