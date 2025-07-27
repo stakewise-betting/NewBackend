@@ -27,7 +27,7 @@ router.get("/all", getAllNews);
 // Get news by ID
 router.get("/:newsId", getNewsByNewsId);
 
-// Get news image by ID
+// Get news image by ID (now redirects to Cloudinary)
 router.get("/:newsId/image", getNewsImage);
 
 // Update existing news with image upload
@@ -58,6 +58,10 @@ router.get("/external/health", async (req, res) => {
       },
       crypto: {
         configured: !!process.env.CRYPTO_API_KEY,
+        status: 'unknown'
+      },
+      cloudinary: {
+        configured: !!process.env.CLOUDINARY_CLOUD_NAME,
         status: 'unknown'
       },
       timestamp: new Date().toISOString()
