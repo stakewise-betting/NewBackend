@@ -8,7 +8,7 @@ const raffleConfig = {
 
 
   // Replace with the actual address after deploying the RaffleDraw contract
-  raffleContractAddress: "0x36580C80319475547A3ecaC3eaD65415D32df61c",
+  raffleContractAddress: "0x7089d030c74d0b967066D50dDF0963B27cB063A2",
   
   // ABI for the RaffleDraw contract
   raffleContractABI: [
