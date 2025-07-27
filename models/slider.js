@@ -18,9 +18,14 @@ const sliderSchema = new mongoose.Schema({
     default: Date.now 
   },
   image: {
-    data: Buffer,
-    contentType: String,
-    filename: String
+    public_id: {
+      type: String,
+      required: true
+    },
+    url: {
+      type: String,
+      required: true
+    }
   },
   status: {
     type: String,

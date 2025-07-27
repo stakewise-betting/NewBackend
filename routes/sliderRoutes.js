@@ -19,3 +19,4 @@ router.put("/update-slider/:id", upload.single("image"), updateSlider);
 router.delete("/delete-slider/:id", deleteSlider);
 
 export default router;
+
