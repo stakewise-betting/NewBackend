@@ -7,6 +7,7 @@ import { setupBlockchainListeners } from "./services/blockchainService.js";
 import statsScheduler from "./services/statsScheduler.js";
 import http from "http";
 import { Server } from "socket.io";
+import { setupRaffleListeners } from "./services/raffleBlockchainService.js";
 
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
@@ -23,6 +24,8 @@ mongoose
 
     // Setup Blockchain Event Listeners AFTER MongoDB connection is established
     setupBlockchainListeners();
+
+    setupRaffleListeners();
 
     // Start the stats scheduler
     statsScheduler.startScheduler();

@@ -18,6 +18,7 @@ import newsRoutes from "./routes/newsRoutes.js";
 import raffleRoutes from "./routes/raffleRoutes.js";
 import leaderboardRoutes from "./routes/leaderboardRoutes.js";
 import sliderRoutes from "./routes/sliderRoutes.js";
+import interestRoutes from './routes/interests.js';
 
 
 const app = express();
@@ -91,6 +92,7 @@ app.use('/api/results',resultRoutes);
 app.use('/api/news', newsRoutes);
 app.use("/api/raffles", raffleRoutes);
 app.use("/api", leaderboardRoutes);
+app.use('/api/interests', interestRoutes);
 
 export default app;
 

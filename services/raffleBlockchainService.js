@@ -1,263 +1,94 @@
 //services/raffleBlockchainService.js
-import Web3 from "web3";
-import config from "../config/config.js";
-import raffleConfig from "../config/raffleConfig.js";
+import Web3 from 'web3';
+import Raffle from '../models/raffleModel.js';
+import config from '../config/config.js';
 
-// Configure Web3 - Use the blockchain provider URL from the main config
-const web3 = new Web3(config.blockchainProviderUrl);
+// --- START OF CORRECTION ---
+// Correctly import the default export from raffleConfig.js
+import raffleConfig from '../config/raffleConfig.js';
+// Then, destructure the variables we need from the imported object
+const { raffleContractABI, raffleContractAddress } = raffleConfig;
+// --- END OF CORRECTION ---
 
-// Get RaffleDraw contract ABI and address from raffleConfig
-const raffleContractABI = raffleConfig.raffleContractABI;
-const raffleContractAddress = raffleConfig.raffleContractAddress;
+let raffleContract;
 
-// Initialize contract
-const raffleContract = new web3.eth.Contract(raffleContractABI, raffleContractAddress);
+// Initialize Web3 with a WebsocketProvider for event listening
+const web3 = new Web3(new Web3.providers.WebsocketProvider(config.blockchainProviderUrl));
 
-// Use the same approach for admin account as used in your other blockchain service
-// This avoids the private key issue and uses a more generic approach for consistency
-let adminAccount = null;
-
-// For read-only functionality - no need to set up the admin account yet
-// Admin account will be initialized when needed for admin operations
-
-// Service for interacting with the RaffleDraw contract
-export const raffleBlockchainService = {
-  // Helper method to get admin account (initialize only when needed)
-  getAdminAccount: async () => {
-    try {
-      if (!adminAccount) {
-        const accounts = await web3.eth.getAccounts();
-        adminAccount = accounts[0]; // Use the first account from the connected node
-      }
-      return adminAccount;
-    } catch (error) {
-      console.error("Error getting admin account:", error);
-      throw new Error(`Blockchain error: ${error.message}`);
+export const setupRaffleListeners = () => {
+    if (!config.blockchainProviderUrl) {
+        console.error("BLOCKCHAIN_PROVIDER_URL is not defined in .env file.");
+        return;
     }
-  },
 
-  // Create a new raffle - Updated to use the RaffleParams struct
-  createRaffleDraw: async (
-    raffleId,
-    name,
-    description,
-    imageURL,
-    startTime,
-    endTime,
-    ticketPrice,
-    prizeAmount,
-    notificationImageURL,
-    notificationMessage
-  ) => {
-    try {
-      const adminAddress = await raffleBlockchainService.getAdminAccount();
+    raffleContract = new web3.eth.Contract(raffleContractABI, raffleContractAddress);
 
-      // Create RaffleParams struct for the updated contract
-      const raffleParams = {
-        name,
-        description,
-        imageURL,
-        startTime,
-        endTime,
-        ticketPrice,
-        prizeAmount,
-        notificationImageURL,
-        notificationMessage
-      };
+    console.log("Setting up RaffleDraw contract listeners...");
 
-      const gasEstimate = await raffleContract.methods
-        .createRaffleDraw(raffleId, raffleParams)
-        .estimateGas({ from: adminAddress });
+    // Listener for RaffleCreated events
+    raffleContract.events.RaffleCreated({})
+        .on('data', async (event) => {
+            console.log('--- RaffleCreated event DETECTED --- Saving to DB...');
+            const { raffleId } = event.returnValues;
 
-      const result = await raffleContract.methods
-        .createRaffleDraw(raffleId, raffleParams)
-        .send({
-          from: adminAddress,
-          gas: Math.round(gasEstimate * 1.2) // Add 20% buffer
+            try {
+                // Check if this raffle is already in the DB to prevent duplicates
+                const existingRaffle = await Raffle.findOne({ raffleId: Number(raffleId) });
+                if (existingRaffle) {
+                    console.log(`Raffle ${raffleId} already exists in the DB. Skipping save.`);
+                    return;
+                }
+                
+                // Fetch the full, confirmed raffle data from the blockchain
+                const raffleDataFromChain = await raffleContract.methods.getRaffle(raffleId).call();
+
+                // Create a new document in the database
+                const newRaffle = new Raffle({
+                    raffleId: Number(raffleDataFromChain.raffleId),
+                    name: raffleDataFromChain.name,
+                    imageURL: raffleDataFromChain.imageURL,
+                    category: raffleDataFromChain.category,
+                    startTime: Number(raffleDataFromChain.startTime),
+                    endTime: Number(raffleDataFromChain.endTime),
+                    // Convert ticketPrice and prizeAmount from Wei back to ETH string for storage
+                    ticketPrice: web3.utils.fromWei(raffleDataFromChain.ticketPrice.toString(), 'ether'),
+                    prizeAmount: web3.utils.fromWei(raffleDataFromChain.prizeAmount.toString(), 'ether'),
+                });
+
+                await newRaffle.save();
+                console.log(`Successfully saved new raffle ${raffleId} to the database.`);
+
+            } catch (error) {
+                console.error(`Error saving raffle ${raffleId} to DB from listener:`, error);
+            }
+        })
+        .on('error', (error) => {
+            console.error('Error listening to RaffleCreated event:', error);
         });
 
-      return {
-        success: true,
-        transactionHash: result.transactionHash,
-        raffleId
-      };
-    } catch (error) {
-      console.error("Error creating raffle on blockchain:", error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
+    // Listener for WinnerDrawn events
+    raffleContract.events.WinnerDrawn({})
+        .on('data', async (event) => {
+            console.log('--- WinnerDrawn event DETECTED ---');
+            const { raffleId, winner } = event.returnValues;
 
-  // Get all raffle IDs
-  getAllRaffleIds: async () => {
-    try {
-      const raffleIds = await raffleContract.methods.getAllRaffleIds().call();
-      return raffleIds.map(id => Number(id));
-    } catch (error) {
-      console.error("Error getting raffle IDs from blockchain:", error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
-
-  // Get raffle details by ID
-  getRaffle: async (raffleId) => {
-    try {
-      const raffle = await raffleContract.methods.getRaffle(raffleId).call();
-      
-      // Convert BigNumber values to JavaScript numbers or strings
-      return {
-        raffleId: Number(raffle.raffleId),
-        name: raffle.name,
-        description: raffle.description,
-        imageURL: raffle.imageURL,
-        startTime: Number(raffle.startTime),
-        endTime: Number(raffle.endTime),
-        ticketPrice: web3.utils.fromWei(raffle.ticketPrice, 'ether'),
-        prizeAmount: web3.utils.fromWei(raffle.prizeAmount, 'ether'),
-        isCompleted: raffle.isCompleted,
-        winner: raffle.winner,
-        totalTicketsSold: Number(raffle.totalTicketsSold),
-        notificationImageURL: raffle.notificationImageURL,
-        notificationMessage: raffle.notificationMessage
-      };
-    } catch (error) {
-      console.error(`Error getting raffle ${raffleId} from blockchain:`, error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
-
-  // Get active raffles
-  getActiveRaffles: async () => {
-    try {
-      const activeRaffleIds = await raffleContract.methods.getActiveRaffles().call();
-      
-      // Fetch details for each active raffle
-      const rafflePromises = activeRaffleIds.map(id => 
-        raffleBlockchainService.getRaffle(Number(id))
-      );
-      
-      return await Promise.all(rafflePromises);
-    } catch (error) {
-      console.error("Error getting active raffles from blockchain:", error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
-
-  // Buy tickets for a raffle
-  buyTicket: async (raffleId, quantity, ticketPrice, userAddress) => {
-    try {
-      // Calculate total price in wei
-      const totalPriceWei = web3.utils.toWei(
-        (parseFloat(ticketPrice) * quantity).toString(),
-        'ether'
-      );
-      
-      const gasEstimate = await raffleContract.methods
-        .buyTicket(raffleId, quantity)
-        .estimateGas({
-          from: userAddress,
-          value: totalPriceWei
+            try {
+                const raffleFromChain = await raffleContract.methods.getRaffle(raffleId).call();
+                await Raffle.findOneAndUpdate(
+                    { raffleId: Number(raffleId) },
+                    { 
+                        isCompleted: true, 
+                        winnerWalletAddress: winner,
+                        totalTicketsSold: Number(raffleFromChain.totalTicketsSold)
+                    },
+                    { new: true }
+                );
+                console.log(`Raffle ${raffleId} updated in DB. Winner: ${winner}`);
+            } catch (error) {
+                console.error(`Error updating raffle ${raffleId} in DB after winner draw:`, error);
+            }
+        })
+        .on('error', (error) => {
+            console.error('Error listening to WinnerDrawn event:', error);
         });
-
-      const result = await raffleContract.methods
-        .buyTicket(raffleId, quantity)
-        .send({
-          from: userAddress,
-          value: totalPriceWei,
-          gas: Math.round(gasEstimate * 1.2) // Add 20% buffer
-        });
-
-      return {
-        success: true,
-        transactionHash: result.transactionHash,
-        tickets: quantity
-      };
-    } catch (error) {
-      console.error(`Error buying tickets for raffle ${raffleId}:`, error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
-
-  // Select winner for a raffle
-  selectWinner: async (raffleId) => {
-    try {
-      const adminAddress = await raffleBlockchainService.getAdminAccount();
-      
-      // Check if raffle is ready for winner selection
-      const isReady = await raffleContract.methods
-        .raffleReadyForWinnerSelection(raffleId)
-        .call();
-      
-      if (!isReady) {
-        throw new Error("Raffle is not ready for winner selection");
-      }
-      
-      const gasEstimate = await raffleContract.methods
-        .selectWinner(raffleId)
-        .estimateGas({
-          from: adminAddress
-        });
-
-      const result = await raffleContract.methods
-        .selectWinner(raffleId)
-        .send({
-          from: adminAddress,
-          gas: Math.round(gasEstimate * 1.2) // Add 20% buffer
-        });
-      
-      // Get winner from event logs
-      const winnerEvent = result.events.WinnerSelected;
-      if (!winnerEvent) {
-        throw new Error("Winner selection event not found");
-      }
-      
-      return {
-        success: true,
-        transactionHash: result.transactionHash,
-        winner: winnerEvent.returnValues.winner,
-        prizeAmount: web3.utils.fromWei(winnerEvent.returnValues.prizeAmount, 'ether')
-      };
-    } catch (error) {
-      console.error(`Error selecting winner for raffle ${raffleId}:`, error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
-
-  // Get user's tickets for a raffle
-  getUserTickets: async (raffleId, userAddress) => {
-    try {
-      const ticketIds = await raffleContract.methods
-        .getUserTickets(raffleId, userAddress)
-        .call();
-      
-      return ticketIds.map(id => Number(id));
-    } catch (error) {
-      console.error(`Error getting user tickets for raffle ${raffleId}:`, error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
-
-  // Check if user has won a raffle
-  hasUserWon: async (raffleId, userAddress) => {
-    try {
-      return await raffleContract.methods
-        .hasUserWon(raffleId, userAddress)
-        .call();
-    } catch (error) {
-      console.error(`Error checking if user won raffle ${raffleId}:`, error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  },
-
-  // Get total admin profit
-  getTotalAdminProfit: async () => {
-    try {
-      const profitWei = await raffleContract.methods.getTotalAdminProfit().call();
-      return web3.utils.fromWei(profitWei, 'ether');
-    } catch (error) {
-      console.error("Error getting total admin profit:", error);
-      throw new Error(`Blockchain error: ${error.message}`);
-    }
-  }
 };
-
-export default raffleBlockchainService;

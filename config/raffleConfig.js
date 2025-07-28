@@ -1,17 +1,15 @@
-// Configuration for the RaffleDraw contract
-import config from "./config.js"; // Import main config
+// NewBackend/config/raffleConfig.js
+import config from "./config.js";
 
-// Configuration for the RaffleDraw contract
 const raffleConfig = {
-    // Get the blockchain provider URL from the main config
+  // Get the blockchain provider URL from the main config
   blockchainProviderUrl: config.blockchainProviderUrl,
-
-
-  // Replace with the actual address after deploying the RaffleDraw contract
-  raffleContractAddress: "0x36580C80319475547A3ecaC3eaD65415D32df61c",
   
-  // ABI for the RaffleDraw contract
-  raffleContractABI: [
+  // Replace with the actual address after deploying the new RaffleDraw contract
+  raffleContractAddress: process.env.RAFFLE_CONTRACT_ADDRESS || "0x2bd352e9ceA69E78fF2fd56F60627a266A6Def8b",
+  
+  // Updated ABI for the new RaffleDraw contract
+  raffleContractABI:   [
     {
       "inputs": [],
       "stateMutability": "nonpayable",
@@ -21,7 +19,7 @@ const raffleConfig = {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint256",
           "name": "raffleId",
           "type": "uint256"
@@ -35,25 +33,13 @@ const raffleConfig = {
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "startTime",
+          "name": "prizeAmount",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
           "name": "endTime",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "ticketPrice",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "prizeAmount",
           "type": "uint256"
         }
       ],
@@ -64,13 +50,13 @@ const raffleConfig = {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint256",
           "name": "raffleId",
           "type": "uint256"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "buyer",
           "type": "address"
@@ -78,13 +64,13 @@ const raffleConfig = {
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "ticketId",
+          "name": "quantity",
           "type": "uint256"
         },
         {
           "indexed": false,
           "internalType": "uint256",
-          "name": "amount",
+          "name": "totalCost",
           "type": "uint256"
         }
       ],
@@ -95,13 +81,13 @@ const raffleConfig = {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint256",
           "name": "raffleId",
           "type": "uint256"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "winner",
           "type": "address"
@@ -113,7 +99,7 @@ const raffleConfig = {
           "type": "uint256"
         }
       ],
-      "name": "WinnerSelected",
+      "name": "WinnerDrawn",
       "type": "event"
     },
     {
@@ -124,6 +110,20 @@ const raffleConfig = {
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "nextRaffleId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -151,26 +151,68 @@ const raffleConfig = {
       "constant": true
     },
     {
-      "inputs": [],
-      "name": "nextRaffleId",
-      "outputs": [
+      "inputs": [
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "totalAdminProfit",
+      "name": "raffles",
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "",
+          "name": "raffleId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "imageURL",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "category",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "startTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "endTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "ticketPrice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "prizeAmount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bool",
+          "name": "isCompleted",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "winner",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "totalTicketsSold",
           "type": "uint256"
         }
       ],
@@ -181,67 +223,46 @@ const raffleConfig = {
     {
       "inputs": [
         {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_imageURL",
+          "type": "string"
+        },
+        {
+          "internalType": "string",
+          "name": "_category",
+          "type": "string"
+        },
+        {
           "internalType": "uint256",
-          "name": "_raffleId",
+          "name": "_startTime",
           "type": "uint256"
         },
         {
-          "components": [
-            {
-              "internalType": "string",
-              "name": "name",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "description",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "imageURL",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "startTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "endTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "ticketPrice",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "prizeAmount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "notificationImageURL",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "notificationMessage",
-              "type": "string"
-            }
-          ],
-          "internalType": "struct RaffleDraw.RaffleParams",
-          "name": "params",
-          "type": "tuple"
+          "internalType": "uint256",
+          "name": "_endTime",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_ticketPrice",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_prizeAmount",
+          "type": "uint256"
         }
       ],
-      "name": "createRaffleDraw",
+      "name": "createRaffle",
       "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
     },
     {
       "inputs": [
@@ -256,7 +277,7 @@ const raffleConfig = {
           "type": "uint256"
         }
       ],
-      "name": "buyTicket",
+      "name": "buyTickets",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function",
@@ -270,24 +291,10 @@ const raffleConfig = {
           "type": "uint256"
         }
       ],
-      "name": "selectWinner",
+      "name": "drawWinner",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getAllRaffleIds",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
     },
     {
       "inputs": [
@@ -313,12 +320,12 @@ const raffleConfig = {
             },
             {
               "internalType": "string",
-              "name": "description",
+              "name": "imageURL",
               "type": "string"
             },
             {
               "internalType": "string",
-              "name": "imageURL",
+              "name": "category",
               "type": "string"
             },
             {
@@ -355,19 +362,9 @@ const raffleConfig = {
               "internalType": "uint256",
               "name": "totalTicketsSold",
               "type": "uint256"
-            },
-            {
-              "internalType": "string",
-              "name": "notificationImageURL",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "notificationMessage",
-              "type": "string"
             }
           ],
-          "internalType": "struct RaffleDraw.RaffleDataView",
+          "internalType": "struct RaffleDraw.RaffleView",
           "name": "",
           "type": "tuple"
         }
@@ -377,44 +374,13 @@ const raffleConfig = {
       "constant": true
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_raffleId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "_user",
-          "type": "address"
-        }
-      ],
-      "name": "getUserTickets",
+      "inputs": [],
+      "name": "getAllRaffleIds",
       "outputs": [
         {
           "internalType": "uint256[]",
           "name": "",
           "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_raffleId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getTotalTicketsSold",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -434,60 +400,12 @@ const raffleConfig = {
           "type": "address"
         }
       ],
-      "name": "hasUserWon",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "getTotalAdminProfit",
+      "name": "getUserTicketCount",
       "outputs": [
         {
           "internalType": "uint256",
           "name": "",
           "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "getActiveRaffles",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_raffleId",
-          "type": "uint256"
-        }
-      ],
-      "name": "raffleReadyForWinnerSelection",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
         }
       ],
       "stateMutability": "view",
@@ -498,5 +416,3 @@ const raffleConfig = {
 };
 
 export default raffleConfig;
-
-

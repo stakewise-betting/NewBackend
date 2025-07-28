@@ -4,75 +4,52 @@ const raffleSchema = new mongoose.Schema({
   raffleId: {
     type: Number,
     required: true,
-    unique: true
+    unique: true,
+    index: true // Add index for faster lookups
   },
   name: {
     type: String,
     required: true,
     trim: true
   },
-  description: {
-    type: String,
-    required: true
-  },
   imageURL: {
     type: String,
     required: true
   },
+  category: {
+    type: String,
+    default: "General"
+  },
   startTime: {
-    type: Number,
+    type: Number, // Storing as Unix timestamp
     required: true
   },
   endTime: {
-    type: Number,
+    type: Number, // Storing as Unix timestamp
     required: true
   },
   ticketPrice: {
-    type: Number,
+    type: String, // Storing as string to handle large numbers (e.g., from Wei)
     required: true
   },
   prizeAmount: {
-    type: Number,
+    type: String, // Storing as string
     required: true
   },
   isCompleted: {
     type: Boolean,
     default: false
   },
-  winner: {
+  winnerWalletAddress: {
     type: String,
     default: null
   },
   totalTicketsSold: {
     type: Number,
     default: 0
-  },
-  notificationImageURL: {
-    type: String,
-    default: ""
-  },
-  notificationMessage: {
-    type: String,
-    default: ""
-  },
-  category: {
-    type: String,
-    default: "General"
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
   }
-});
-
-// Pre-save hook to update the updatedAt field
-raffleSchema.pre("save", function(next) {
-  this.updatedAt = Date.now();
-  next();
+}, {
+  timestamps: true // Adds createdAt and updatedAt fields
 });
 
 export default mongoose.model("Raffle", raffleSchema);
