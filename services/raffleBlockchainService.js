@@ -1,4 +1,4 @@
-//services/raffleBlockchainService.js
+//NewBackend/services/raffleBlockchainService.js
 import Web3 from 'web3';
 import Raffle from '../models/raffleModel.js';
 import config from '../config/config.js';
