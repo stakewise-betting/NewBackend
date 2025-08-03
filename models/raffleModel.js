@@ -1,3 +1,4 @@
+//NewBackend/models/raffleModel.js
 import mongoose from "mongoose";
 
 const raffleSchema = new mongoose.Schema({
